@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using _02_Scripts.Eobak;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -18,8 +19,6 @@ public class RankData
 
 public class NetworkManager : MonoBehaviour
 {
-    private string rankingUrl = "http:localhost:3000/ranking"; // 서버 URL 설정
-
     public void GetRankingData()
     {
         StartCoroutine(GetRankingDataCoroutine());
@@ -27,7 +26,7 @@ public class NetworkManager : MonoBehaviour
 
     IEnumerator GetRankingDataCoroutine()
     {
-        using (UnityWebRequest webRequest = UnityWebRequest.Get(rankingUrl))
+        using (UnityWebRequest webRequest = UnityWebRequest.Get(Constants.ServerURL + "/ranking"))
         {
             // 헤더에 인증 정보 추가 (세션 쿠키)
             string sid = PlayerPrefs.GetString("sid", "");
