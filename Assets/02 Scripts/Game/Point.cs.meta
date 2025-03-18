@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0b9eee3377f58534f9192e3dc00dcbbd
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - emptySprite: {fileID: 21300000, guid: a1932e5d8dd9fb8408efeb63040db2ff, type: 3}
+  - blackStoneSprite: {fileID: 21300000, guid: 04c7ff44a8f0d3a4aa4ce6abd4cc9020, type: 3}
+  - whiteStoneSprite: {fileID: 21300000, guid: 04af5aea6e440044d9ba93514f60274b, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
