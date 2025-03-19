@@ -4,32 +4,50 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }  // 싱글턴 인스턴스
     public GameObject[] omokPoints;  // 바둑판 위의 접점들
     public int boardSize = 15;  // 15x15 바둑판 크기
     private int currentPlayer = 1;  // 1: 흑돌, 2: 백돌
 
-    void Start()
+    void Awake()
     {
-        // 바둑판의 모든 접점 오브젝트를 찾아 배열에 자동으로 할당
-        omokPoints = new GameObject[boardSize * boardSize];  // 15x15 크기만큼 배열 크기 설정
-
-        // "Image (1)"부터 "Image (225)"까지의 이름을 가진 오브젝트들을 배열에 할당
-        omokPoints[0] = GameObject.Find("Image");
-        for (int i = 1; i < omokPoints.Length; i++)
+        // 싱글턴 패턴 적용 (중복 생성 방지)
+        if (Instance == null)
         {
-            string objectName = "Image (" + (i) + ")";  // "Image (1)", "Image (2)" 형태의 이름 생성
-            omokPoints[i] = GameObject.Find(objectName);  // 이름을 통해 해당 오브젝트를 찾고 배열에 할당
+            Instance = this;
         }
-
-        // 이제 omokPoints 배열에는 모든 "Image (1)"부터 "Image (225)"까지의 오브젝트들이 자동으로 들어감
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
     }
 
-    public void OnPointClick(GameObject clickedPoint)
+    void Start()
     {
-        Point pointScript = clickedPoint.GetComponent<Point>();
-        pointScript.OnClick(currentPlayer);
+        // 바둑판의 모든 접점 오브젝트를 찾아 배열에 자동 할당
+        omokPoints = new GameObject[boardSize * boardSize];
 
-        // 턴 변경
+        for (int i = 0; i < omokPoints.Length; i++)
+        {
+            string objectName = (i == 0) ? "Image" : $"Image ({i})";
+            omokPoints[i] = GameObject.Find(objectName);
+
+            if (omokPoints[i] == null)
+            {
+                Debug.LogError($"오브젝트 '{objectName}'을(를) 찾을 수 없습니다! 이름을 확인하세요.");
+            }
+        }
+    }
+
+    public int GetCurrentPlayer()
+    {
+        return currentPlayer;
+    }
+
+    public void ChangeTurn()
+    {
         currentPlayer = (currentPlayer == 1) ? 2 : 1;
+        Debug.Log($"현재 턴: {(currentPlayer == 1 ? "흑돌" : "백돌")}");
     }
 }

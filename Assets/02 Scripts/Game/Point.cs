@@ -1,36 +1,42 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Point : MonoBehaviour
 {
-    public Sprite emptySprite;  // 빈 칸 이미지
-    public Sprite blackStoneSprite;  // 흑돌 이미지
-    public Sprite whiteStoneSprite;  // 백돌 이미지
+    public Sprite emptySprite;
+    public Sprite blackStoneSprite;
+    public Sprite whiteStoneSprite;
 
-    private SpriteRenderer spriteRenderer;
-    private bool isOccupied = false;  // 이 칸에 돌이 놓였는지 체크
+    private Image imageComponent;
+    private bool isOccupied = false;
 
     void Start()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.sprite = emptySprite;  // 초기 상태는 빈 칸
+        imageComponent = GetComponent<Image>();
+        if (imageComponent == null)
+        {
+            Debug.LogError($"{gameObject.name}에 Image 컴포넌트가 없습니다!");
+            return;
+        }
+        imageComponent.sprite = emptySprite;
+
+        // ✅ 버튼 이벤트 추가
+        Button button = GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.AddListener(() => OnClick(GameManager.Instance.GetCurrentPlayer()));
+        }
     }
 
-    // 클릭 시 돌을 놓는 함수
     public void OnClick(int playerTurn)
     {
         if (!isOccupied)
         {
             isOccupied = true;
-            if (playerTurn == 1)
-            {
-                spriteRenderer.sprite = blackStoneSprite;  // 흑돌
-            }
-            else
-            {
-                spriteRenderer.sprite = whiteStoneSprite;  // 백돌
-            }
+            imageComponent.sprite = (playerTurn == 1) ? blackStoneSprite : whiteStoneSprite;
+            GameManager.Instance.ChangeTurn();
         }
     }
 }
