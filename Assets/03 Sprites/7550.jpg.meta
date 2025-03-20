@@ -113,12 +113,12 @@ TextureImporter:
       name: 7550_0
       rect:
         serializedVersion: 2
-        x: 4364
-        y: 2722
-        width: 729
-        height: 527
+        x: 534
+        y: 574
+        width: 900
+        height: 843
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -126,6 +126,363 @@ TextureImporter:
       bones: []
       spriteID: 0a3dc98d9a84d0b4485bfb8e2cf73e7f
       internalID: 170793087
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_1
+      rect:
+        serializedVersion: 2
+        x: 5322
+        y: 0
+        width: 428
+        height: 531
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6706faf0e84628c47864e317f87b172f
+      internalID: -296983100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_2
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 1572
+        width: 964
+        height: 808
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 585e29dccb9199841a0bb807d622d9c2
+      internalID: -1486971659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_3
+      rect:
+        serializedVersion: 2
+        x: 519
+        y: 2591
+        width: 1006
+        height: 802
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1db47b11724facf4f816bc9a92f5a92e
+      internalID: -569283088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_4
+      rect:
+        serializedVersion: 2
+        x: 568
+        y: 3681
+        width: 908
+        height: 711
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f337144e2946ac44a86a1e943ddec8e1
+      internalID: -2026714584
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_5
+      rect:
+        serializedVersion: 2
+        x: 1764
+        y: 3653
+        width: 935
+        height: 725
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 48e845057dedee743b22482aeefdaa9d
+      internalID: 1933071434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_6
+      rect:
+        serializedVersion: 2
+        x: 1898
+        y: 2676
+        width: 893
+        height: 682
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8cba987a461b700479e7060aa3630d20
+      internalID: 841726325
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_7
+      rect:
+        serializedVersion: 2
+        x: 1820
+        y: 1586
+        width: 830
+        height: 745
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7625e5cd488dbfc4c919fe11d0cd0406
+      internalID: -697501714
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_8
+      rect:
+        serializedVersion: 2
+        x: 1764
+        y: 559
+        width: 1125
+        height: 802
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d3f1bb2b9e12e844bfa8aa8aa3202e3
+      internalID: -872533221
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_9
+      rect:
+        serializedVersion: 2
+        x: 3086
+        y: 545
+        width: 788
+        height: 710
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3eee1603596dbd846a1e4c7f4c4eb369
+      internalID: -712136808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_10
+      rect:
+        serializedVersion: 2
+        x: 4070
+        y: 517
+        width: 1210
+        height: 752
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c7143354add77b4eb920dc43c2f0aa7
+      internalID: 1994237433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_11
+      rect:
+        serializedVersion: 2
+        x: 4281
+        y: 1635
+        width: 964
+        height: 724
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: efbd7fdb568ab9f4cb24108ea8b5a174
+      internalID: 1643364053
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_12
+      rect:
+        serializedVersion: 2
+        x: 4352
+        y: 2598
+        width: 872
+        height: 767
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1660acd6ddc697b4382d87f3279dce20
+      internalID: -2024927963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_13
+      rect:
+        serializedVersion: 2
+        x: 4345
+        y: 3759
+        width: 808
+        height: 534
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a15f4dcb3f7aee4c9ecf825b6dec20b
+      internalID: -1909586548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_14
+      rect:
+        serializedVersion: 2
+        x: 3037
+        y: 3660
+        width: 865
+        height: 640
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7cd09dac3a0f9c6428fbdfd074ac88de
+      internalID: -439295531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_15
+      rect:
+        serializedVersion: 2
+        x: 3016
+        y: 2697
+        width: 879
+        height: 626
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 96e8386fb50aacc479e3c151f037e072
+      internalID: -1918941022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_16
+      rect:
+        serializedVersion: 2
+        x: 3037
+        y: 1635
+        width: 886
+        height: 633
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3bf645821f80eb4cb5805d255e4cf59
+      internalID: -1277409171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7550_17
+      rect:
+        serializedVersion: 2
+        x: 3093
+        y: 566
+        width: 872
+        height: 668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 375682c0ee72f0845ba89c6c689451d6
+      internalID: 1959538070
       vertices: []
       indices: 
       edges: []
@@ -142,6 +499,23 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       7550_0: 170793087
+      7550_1: -296983100
+      7550_10: 1994237433
+      7550_11: 1643364053
+      7550_12: -2024927963
+      7550_13: -1909586548
+      7550_14: -439295531
+      7550_15: -1918941022
+      7550_16: -1277409171
+      7550_17: 1959538070
+      7550_2: -1486971659
+      7550_3: -569283088
+      7550_4: -2026714584
+      7550_5: 1933071434
+      7550_6: 841726325
+      7550_7: -697501714
+      7550_8: -872533221
+      7550_9: -712136808
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
