@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SigninController : MonoBehaviour
 {
-    [SerializeField] private TMP_InputField passwordInputField; // TMPÀÇ InputField
+    [SerializeField] private TMP_InputField passwordInputField; // TMPì˜ InputField
     [SerializeField] private GameObject signinPanel;
     private bool isPasswordVisible = false;
 
@@ -21,7 +21,7 @@ public class SigninController : MonoBehaviour
         }
 
         isPasswordVisible = !isPasswordVisible;
-        passwordInputField.ForceLabelUpdate(); // º¯°æµÈ ³»¿ë Àû¿ë
+        passwordInputField.ForceLabelUpdate(); // ë³€ê²½ëœ ë‚´ìš© ì ìš©
     }
 
     public void OnClickSigninButton()
@@ -32,7 +32,7 @@ public class SigninController : MonoBehaviour
         }
         else
         {
-            Debug.Log("signinPanelÀÌ ÇÒ´çµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.Log("signinPanelì´ í• ë‹¹ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
         }
     }
 }
