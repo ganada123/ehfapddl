@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: dc094d9a53c9d3b42a9ed70a16a9faf5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - blackMarkerPrefab: {fileID: 3083679321410254573, guid: f77d38c7f7fd50e4b91d8e9348596daf, type: 3}
+  - whiteMarkerPrefab: {fileID: 3338780458784637494, guid: 196d5fd834963e94cad75113e6729e20, type: 3}
+  - canvas: {instanceID: 0}
+  - titleText: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
