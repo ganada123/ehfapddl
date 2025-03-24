@@ -9,9 +9,9 @@ using Random = UnityEngine.Random;
 // Board                    보드 15x15 배열
 // board.CheckWin           승패판정
 // board.PlaceMove          돌 두기
-// board.IsValidMoves       돌을 둘 수 있는 좌표 (int,int) 반환
+// board.IsValidMoves       돌을 둘 수 있는 좌표 List<(int,int)> 반환
 
-// CountPattern,CountOpenPattern,CheckPattern의 경우 준석님 것이 있으면 그것을 사용
+// PatternScore의 경우 준석님 것이 있으면 그것을 사용
 
 public class AIController
 {
@@ -48,16 +48,61 @@ public class AIController
     {
         var moves = board.IsValidMoves();
         if (moves.Count == 0) return (-1, -1);
-        Random rand = new Random();
-        return moves[rand.Next(moves.Count)];
+
+        int index = Random.Range(0, moves.Count);
+        return moves[index];
     }
 
+    // 모든 범위를 탐색하지 않고, 기존에 놓인 돌을 기준으로 2칸 이내만 탐색
+    // 탐색량을 줄여 탐색 속도를 높임
+    private List<(int, int)> GetNearbyMoves(Board board)
+    {
+        HashSet<(int, int)> nearby = new HashSet<(int, int)>();
+        for (int x = 0; x < board.SIZE; x++)
+        {
+            for (int y = 0; y < board.SIZE; y++)
+            {
+                if (board[x, y] != 0)
+                {
+                    for (int dx = -2; dx <= 2; dx++)
+                    {
+                        for (int dy = -2; dy <= 2; dy++)
+                        {
+                            int nx = x + dx;
+                            int ny = y + dy;
+                            if (nx >= 0 && ny >= 0 && nx < board.SIZE && ny < board.SIZE && board[nx, ny] == 0)
+                                nearby.Add((nx, ny));
+                        }
+                    }
+                }
+            }
+        }
+
+        return new List<(int, int)>(nearby);
+    }
+    
+    private bool GameWin(Board board, (int, int) move, int player)
+    {
+        board.PlaceMove(move.Item1, move.Item2, player);
+        bool win = board.CheckWin(player);
+        board.PlaceMove(move.Item1, move.Item2, 0);
+        return win;
+    }
+    
     private (int, int) MinimaxBestMove(Board board, int depth)
     {
         int bestScore = int.MinValue;
         (int, int) bestMove = (-1, -1);
 
-        foreach (var move in board.IsValidMoves())
+        List<(int, int)> moves = GetNearbyMoves(board);
+        
+        foreach (var move in moves)
+        {
+            if (GameWin(board, move, aiPlayer)) return move;  // AI 즉시 승리
+            if (GameWin(board, move, humanPlayer)) return move;  // 즉시 차단
+        }
+        
+        foreach (var move in moves)
         {
             board.PlaceMove(move.Item1, move.Item2, aiPlayer);
             int score = Minimax(board, depth, false, int.MinValue, int.MaxValue);
@@ -74,15 +119,32 @@ public class AIController
 
     private int Minimax(Board board, int depth, bool isMaximizing, int alpha, int beta)
     {
-        if (depth == 0 || board.CheckWin(aiPlayer) || board.CheckWin(humanPlayer))
-        {
-            return EvaluateBoard(board);
-        }
+        // TODO: 무승부 처리 필요
+        if (board.IsValidMoves().Count == 0)
+            return 0;
+        
+        if (board.CheckWin(aiPlayer))
+            return int.MaxValue - depth;
 
+        if (board.CheckWin(humanPlayer))
+            return int.MinValue + depth;
+
+        if (depth == 0)
+            return EvaluateBoard(board);
+
+        List<(int, int)> moves = GetNearbyMoves(board);
+        // 가장 유망한 수부터 두도록 정렬하여 알파-베타 가지치기가 더 많이 작동하도록 함
+        moves.Sort((a, b) =>
+            EvaluateMove(board, b, isMaximizing ? aiPlayer : humanPlayer)
+                .CompareTo(
+                    EvaluateMove(board, a, isMaximizing ? aiPlayer : humanPlayer))
+        );
+        
+        
         if (isMaximizing)
         {
             int maxEval = int.MinValue;
-            foreach (var move in board.IsValidMoves())
+            foreach (var move in moves)
             {
                 board.PlaceMove(move.Item1, move.Item2, aiPlayer);
                 int eval = Minimax(board, depth - 1, false, alpha, beta);
@@ -97,7 +159,7 @@ public class AIController
         else
         {
             int minEval = int.MaxValue;
-            foreach (var move in board.IsValidMoves())
+            foreach (var move in moves)
             {
                 board.PlaceMove(move.Item1, move.Item2, humanPlayer);
                 int eval = Minimax(board, depth - 1, true, alpha, beta);
@@ -111,78 +173,98 @@ public class AIController
         }
     }
 
-    private int EvaluateBoard(Board board)
+    private int EvaluateMove(Board board, (int, int) move, int player)
     {
-        // 수치 조정은 차후...
-        int score = 0;
-        score += CountPatterns(board, aiPlayer, 5) * 10000;
-        score += CountPatterns(board, aiPlayer, 4) * 1000;
-        score += CountPatterns(board, aiPlayer, 3) * 100;
-        score += CountOpenPatterns(board, aiPlayer, 4) * 2000;
-        score += CountOpenPatterns(board, aiPlayer, 3) * 500;
-        
-        
-        
-        score -= CountPatterns(board, humanPlayer, 5) * 10000;
-        score -= CountPatterns(board, humanPlayer, 4) * 1000;
-        score -= CountPatterns(board, humanPlayer, 3) * 100;
-        score -= CountOpenPatterns(board, humanPlayer, 4) * 2000;
-        score -= CountOpenPatterns(board, humanPlayer, 3) * 500;
-        
+        board.PlaceMove(move.Item1, move.Item2, player);
+        int score = EvaluateBoard(board);
+        board.PlaceMove(move.Item1, move.Item2, 0);
         return score;
     }
-
-    private int CountPatterns(Board board, int player, int length)
+    
+    private int EvaluateBoard(Board board)
     {
-        int count = 0;
+        return EvaluatePlayer(board, aiPlayer) - EvaluatePlayer(board, humanPlayer);
+    }
+    
+    private int EvaluatePlayer(Board board, int player)
+    {
+        int score = 0;
+        
         for (int x = 0; x < board.SIZE; x++)
         {
             for (int y = 0; y < board.SIZE; y++)
             {
-                if (board.board[x, y] == player)
-                {
-                    if (CheckPattern(board, x, y, 1, 0, player, length) ||  // 가로
-                        CheckPattern(board, x, y, 0, 1, player, length) ||  // 세로
-                        CheckPattern(board, x, y, 1, 1, player, length) ||  // 대각선 \
-                        CheckPattern(board, x, y, 1, -1, player, length))   // 대각선 /
-                    {
-                        count++;
-                    }
-                }
+                score += EvaluateDirection(board, x, y, 1, 0, player); // 가로
+                score += EvaluateDirection(board, x, y, 0, 1, player); // 세로
+                score += EvaluateDirection(board, x, y, 1, 1, player); // 대각 /
+                score += EvaluateDirection(board, x, y, 1, -1, player); // 대각 \
             }
         }
-        return count;
+        return score;
     }
-
-    private bool CheckPattern(Board board, int x, int y, int dx, int dy, int player, int length)
+    
+    private int EvaluateDirection(Board board, int x, int y, int dx, int dy, int player)
     {
-        int count = 0;
-        for (int i = 0; i < length; i++)
+        int size = board.SIZE;
+        int[] line = new int[7];
+
+        for (int i = -1; i <= 5; i++)
         {
             int nx = x + i * dx;
             int ny = y + i * dy;
-            if (nx >= 0 && ny >= 0 && nx < board.SIZE && ny < board.SIZE && board.board[nx, ny] == player)
-            {
-                count++;
-            }
-            else break;
+
+            if (nx < 0 || ny < 0 || nx >= size || ny >= size)
+                line[i + 1] = -99;
+            else
+                line[i + 1] = board[nx, ny];
         }
-        return count == length;
+
+        return PatternScore(line, player);
     }
     
-    private int CountOpenPatterns(Board board, int player, int length)
+    private int PatternScore(int[] line, int player)
     {
-        int count = 0;
-        foreach (var move in board.IsValidMoves())
-        {
-            (int x, int y) = move;
-            board.PlaceMove(x, y, player);
-            if (CountPatterns(board, player, length) > 0)
-            {
-                count++;
-            }
-            board.PlaceMove(x, y, 0);
-        }
-        return count;
+        // 필요시 패턴 추가 필요 ( 모든 패턴을 추가하는 것보다 필요한 패턴만 추가하여 가중치를 조절 하는 것이 더 효과적일 수 있다...)
+        // TODO: 쌍삼의 경우 단방향 패턴 검사인 PatternScore가 아닌 모든 방향에 대해 검사하는 EvaluatePlayer에서 추가해야 할 것으로 보임
+        // TODO: 가중치 수정 필요!!!
+        // 가중치에 따라 엉망이 될 수도 있음...
+        
+        int enemy = -player;
+
+        // 열린 4: 0 P P P P 0
+        if (line[0] == 0 && line[1] == player && line[2] == player && line[3] == player && line[4] == player && line[5] == 0)
+            return 10000;
+        
+        // 가운데 비어있는 4: P P 0 P P
+        if (line[1] == player && line[2] == player && line[3] == 0 && line[4] == player && line[5] == player)
+            return 9000;
+
+        // 닫힌 4: X P P P P 0 or 0 P P P P X
+        if ((line[0] == enemy && line[1] == player && line[2] == player && line[3] == player && line[4] == player && line[5] == 0) ||
+            (line[0] == 0 && line[1] == player && line[2] == player && line[3] == player && line[4] == player && line[5] == enemy))
+            return 1000;
+
+        // 열린 비연속 3: 0 P P 0 P 0
+        if (line[0] == 0 && line[1] == player && line[2] == player && line[3] == 0 && line[4] == player && line[5] == 0)
+            return 700;
+        
+        // 열린 비연속 3: 0 P 0 P P 0
+        if (line[0] == 0 && line[1] == player && line[2] == 0 && line[3] == player && line[4] == player && line[5] == 0)
+            return 700;
+        
+        // 열린 3: 0 P P P 0
+        if (line[1] == 0 && line[2] == player && line[3] == player && line[4] == player && line[5] == 0)
+            return 500;
+
+        // 닫힌 3: X P P P 0 or 0 P P P X
+        if ((line[1] == enemy && line[2] == player && line[3] == player && line[4] == player && line[5] == 0) ||
+            (line[1] == 0 && line[2] == player && line[3] == player && line[4] == player && line[5] == enemy))
+            return 100;
+
+        // 열린 2: 0 P P 0
+        if (line[2] == 0 && line[3] == player && line[4] == player && line[5] == 0)
+            return 50;
+
+        return 0;
     }
 }
