@@ -104,7 +104,6 @@ public class MultiplayManager : IDisposable
     public Action<SetColorData> OnSetColor;                         // 1. 색 선택 옵션: 서버에서 랜덤으로 색 받아오는 이벤트
     public Action<ColorAssignedData> OnColorAssigned;               // 2. 색 선택 옵션: 클라이언트에서 랜덤으로 색 정하고 서버로 보내기
     public Action OnShowColor;                                      // 색을 화면에 표시하거나 룰렛 연출 시작 이벤트
-    //public Action OnStartGame;                                      // 서버쪽 startGameTime 이후 게임 시작 이벤트
     public Action<StonePlacedData> OnStonePlaced;                   // 착수된 돌의 정보를 받아오는 이벤트
     public Action<OpoonentResignData> OnOpponentResigned;           // 상대방이 기권했을 때 이벤트
     public Action<ResignData> OnResigned;                           // 자신이 기권했을 때 이벤트
@@ -136,7 +135,6 @@ public class MultiplayManager : IDisposable
         _socket.On("setColor", SetColor);
         _socket.On("colorAssigned", ColorAssigned);
         _socket.On("showColor", ShowColor);
-        //_socket.On("startGame", StartGame);
         _socket.On("stonePlaced", StonePlaced);
         _socket.On("opponentResigned", OpponentResigned);
         _socket.On("resigned", Resigned);
@@ -186,16 +184,6 @@ public class MultiplayManager : IDisposable
     {
         OnShowColor?.Invoke();
     }
-
-    // 서버에서 socket.on('startGame'...)으로 이벤트를 받아와서 처리하는 거로 바꿈. 클라이언트에서 연출시간 조절..
-    // 게임 시작할 때 MultiplayManager.StartGame()을 사용해서 서버로 보낼것.. 
-    
-    // 서버쪽 startGameTime 이후 실행 TODO: 필요시 startGameTime 조정
-    // 게임 시작할 때 넣어주면 됩니다.
-    // private void StartGame(SocketIOResponse response)
-    // {
-    //     OnStartGame?.Invoke();
-    // }
 
     // 착수된 돌의 정보를 받아오는 이벤트
     private void StonePlaced(SocketIOResponse response)
