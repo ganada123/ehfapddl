@@ -12,21 +12,17 @@ public class StonePlacedData
     public int row { get; set; }
     [JsonProperty("col")]
     public int col { get; set; }
+    // 게임 중 상대방이 돌을 놓았을 때 서버에서 'stonePlaced' 이벤트를 통해 착수된 돌의 행(row)과 열(col) 정보를 받아와 게임 화면에 반영할 때 사용됩니다.
 }
 
 public class RoomIdData
 {
     [JsonProperty("roomId")]
     public string roomId { get; set; }
+    // 서버에서 방이 생성되었거나 재대국을 위해 새로운 방이 생성되었을 때, 해당 방의 고유 ID(roomId)를 받아올 때 사용됩니다.
 }
 
-public class UserIdData
-{
-    [JsonProperty("userId")]
-    public string userId { get; set; }
-}
-
-public class OpponentInfoData
+public class SetColorData
 {
     [JsonProperty("opponentNickname")]
     public string opponentNickname { get; set; }
@@ -34,12 +30,21 @@ public class OpponentInfoData
     public string myColor { get; set; }
     [JsonProperty("roomId")]
     public string roomId { get; set; }
+    // 매칭 후 서버에서 'setColor' 이벤트를 통해 상대방 닉네임(opponentNickname), 자신의 색깔(myColor), 그리고 방 ID(roomId)를 초기 설정 시 받아올 때 사용됩니다. (색깔 선택 옵션 1: 서버 랜덤)
+}
+
+public class ColorAssignedData
+{
+    [JsonProperty("myColor")]
+    public string myColor { get; set; }
+    // 클라이언트가 자신의 색깔을 선택하여 서버에 알렸을 때, 서버에서 'colorAssigned' 이벤트를 통해 최종적으로 할당된 자신의 색깔(myColor)을 확인받을 때 사용됩니다. (색깔 선택 옵션 2: 클라이언트 선택)
 }
 
 public class ResignData
 {
     [JsonProperty("opponentNickname")]
     public string opponentNickname { get; set; }
+    // 자신이 'resignGame' 이벤트를 통해 기권했을 때, 서버에서 'resigned' 이벤트를 통해 상대방의 닉네임(opponentNickname)을 받아와 게임 종료 화면 등에 표시할 때 사용됩니다.
 }
 
 public class OpoonentResignData
@@ -48,18 +53,21 @@ public class OpoonentResignData
     public string winnerNickname { get; set; }
     [JsonProperty("loserNickname")]
     public string loserNickname { get; set; }
+    // 상대방이 기권하여 게임이 종료되었을 때, 서버에서 'opponentResigned' 이벤트를 통해 승자(winnerNickname)와 패자(loserNickname)의 닉네임을 받아와 게임 종료 화면 등에 표시할 때 사용됩니다.
 }
 
 public class DrawRequestData
 {
     [JsonProperty("requesterNickname")]
     public string requesterNickname { get; set; }
+    // 서버에서 'opponentRequestedDraw' 이벤트를 통해 상대방이 무승부를 요청했을 때, 요청한 사람의 닉네임(requesterNickname)을 받아와 무승부 수락/거절 UI를 표시할 때 사용됩니다.
 }
 
 public class DrawRejectData
 {
     [JsonProperty("rejecterNickname")]
     public string rejecterNickname { get; set; }
+    // 상대방이 자신의 무승부 요청을 거절했을 때, 서버에서 'drawRejected' 이벤트를 통해 거절한 사람의 닉네임(rejecterNickname)을 받아와 사용자에게 알릴 때 사용됩니다.
 }
 
 public class RematchRequestData
@@ -68,6 +76,7 @@ public class RematchRequestData
     public string requesterNickname { get; set; }
     [JsonProperty("roomId")]
     public string roomId { get; set; }
+    // 서버에서 'rematchRequested' 이벤트를 통해 상대방이 재대국을 요청했을 때, 요청한 사람의 닉네임(requesterNickname)과 방 ID(roomId)를 받아와 재대국 수락/거절 UI를 표시할 때 사용됩니다.
 }
 
 public class RematchRejectData
@@ -76,39 +85,42 @@ public class RematchRejectData
     public string rejecterNickname { get; set; }
     [JsonProperty("roomId")]
     public string roomId { get; set; }
+    // 서버에서 'rematchRejected' 이벤트를 통해 상대방이 재대국 요청을 거절했을 때, 거절한 사람의 닉네임(rejecterNickname)과 방 ID(roomId)를 받아와 사용자에게 알릴 때 사용됩니다.
 }
 
 public class DisconnectedData
 {
     [JsonProperty("winner")]
     public string winner { get; set; }
+    // 서버에서 'opponentDisconnectedGameplay' 이벤트를 통해 게임 도중 상대방 연결이 끊어졌을 때, 승자(winner)의 닉네임을 받아올 때 사용됩니다.
 }
 
 public class MultiplayManager : IDisposable
 {
     private SocketIOUnity _socket;
     private event Action<Constants.MultiplayManagerState, string> _onMultiplayStateChanged;
-    
-    public Action<RoomIdData> OnRoomCreatedForMatch;
-    public Action<OpponentInfoData> OnSendInfo;
-    public Action OnShowColor;
-    public Action OnStartGameEvent;
-    public Action<StonePlacedData> OnStonePlaced;
-    public Action<OpoonentResignData> OnOpponentResigned;
-    public Action<ResignData> OnResigned;
-    public Action<DrawRequestData> OnOpponentRequestedDraw;
-    public Action OnGameDraw;
-    public Action<DrawRejectData> OnDrawRejected;
-    public Action<RematchRequestData> OnRematchRequested;
-    public Action<RematchRejectData> OnRematchRejected;
-    public Action<DisconnectedData> OnOpponentDisconnectedGameplay;
-    public Action OnOpponentDisconnectedBeforeStart;
-    public Action OnExitRoomEvent;
-    public Action OnGameEndedByResign;
-    public Action<RoomIdData> OnRoomCreatedForRematch;
-    public Action OnWaitingForMatch;
-    public Action OnMatchWithAI;
-    public Action OnMatchmakingCancelled;
+
+    public Action<RoomIdData> OnRoomCreatedForMatch;                // 매치를 위한 방 생성 완료 이벤트
+    public Action<SetColorData> OnSetColor;                         // 1. 색 선택 옵션: 서버에서 랜덤으로 색 받아오는 이벤트
+    public Action<ColorAssignedData> OnColorAssigned;               // 2. 색 선택 옵션: 클라이언트에서 랜덤으로 색 정하고 서버로 보내기
+    public Action OnShowColor;                                      // 색을 화면에 표시하거나 룰렛 연출 시작 이벤트
+    //public Action OnStartGame;                                      // 서버쪽 startGameTime 이후 게임 시작 이벤트
+    public Action<StonePlacedData> OnStonePlaced;                   // 착수된 돌의 정보를 받아오는 이벤트
+    public Action<OpoonentResignData> OnOpponentResigned;           // 상대방이 기권했을 때 이벤트
+    public Action<ResignData> OnResigned;                           // 자신이 기권했을 때 이벤트
+    public Action<DrawRequestData> OnOpponentRequestedDraw;         // 상대방이 무승부를 요청했을 때 이벤트
+    public Action OnGameDraw;                                       // 게임이 무승부로 종료되었을 때 이벤트
+    public Action<DrawRejectData> OnDrawRejected;                   // 상대방이 무승부 요청을 거절했을 때 이벤트
+    public Action<RematchRequestData> OnRematchRequested;           // 상대방이 재대국을 요청했을 때 이벤트
+    public Action<RematchRejectData> OnRematchRejected;             // 상대방이 재대국 요청을 거절했을 때 이벤트
+    public Action<DisconnectedData> OnOpponentDisconnectedGameplay; // 게임 플레이 도중 상대방 연결이 끊어졌을 때 이벤트
+    public Action OnOpponentDisconnectedBeforeStart;                // 게임 시작 전에 상대방 연결이 끊어졌을 때 이벤트
+    public Action OnExitRoom;                                       // 방을 나갔을 때 이벤트
+    public Action OnGameEndedByResign;                              // 기권으로 인해 게임이 종료되었을 때 이벤트
+    public Action<RoomIdData> OnRoomCreatedForRematch;              // 재대국을 위한 방 생성 완료 이벤트
+    public Action OnWaitingForMatch;                                // 매칭 대기 중 이벤트
+    public Action OnMatchWithAI;                                    // AI와 매칭되었을 때 이벤트
+    public Action OnMatchmakingCancelled;                           // 매칭이 취소되었을 때 이벤트
 
     public MultiplayManager(Action<Constants.MultiplayManagerState, string> onMultiplayStateChanged)
     {
@@ -119,11 +131,12 @@ public class MultiplayManager : IDisposable
         {
             Transport = SocketIOClient.Transport.TransportProtocol.WebSocket
         });
-        
+
         _socket.On("roomCreatedForMatch", RoomCreatedForMatch);
         _socket.On("setColor", SetColor);
+        _socket.On("colorAssigned", ColorAssigned);
         _socket.On("showColor", ShowColor);
-        _socket.On("startGame", StartGame);
+        //_socket.On("startGame", StartGame);
         _socket.On("stonePlaced", StonePlaced);
         _socket.On("opponentResigned", OpponentResigned);
         _socket.On("resigned", Resigned);
@@ -143,19 +156,29 @@ public class MultiplayManager : IDisposable
 
         _socket.Connect();
     }
-    
+
     // 매치를 위한 방 생성 완료, param: (roomID)
     private void RoomCreatedForMatch(SocketIOResponse response)
     {
         var data = response.GetValue<RoomIdData>();
         OnRoomCreatedForMatch?.Invoke(data);
     }
-    
-    // 상대 플레이어(opponentNickname), 자기 색깔(myColor), 방 고유 ID(roomId)를 받아오는 이벤트 
+
+    // 1. 색 선택 옵션: 서버에서 랜덤으로 색 받아오기
+    // 상대 플레이어(opponentNickname), 자기 색깔(myColor), 방 고유 ID(roomId)를 받아오는 이벤트
     private void SetColor(SocketIOResponse response) // 만든 의도: 색 설정하고 상대방의 색도 설정해라
     {
-        var data = response.GetValue<OpponentInfoData>();
-        OnSendInfo?.Invoke(data);
+        var data = response.GetValue<SetColorData>();
+        OnSetColor?.Invoke(data);
+    }
+
+    // 2. 색 선택 옵션: 클라이언트에서 색 정하고 서버로 보내기
+    // 2.을 택할 경우 선호도 시스템을 만들것을 제안. 클라이언트, 서버에서 구축해야함.(현재 미구현)
+    // 클라이언트가 정해주는 색깔을 사용하기
+    private void ColorAssigned(SocketIOResponse response)
+    {
+        var data = response.GetValue<ColorAssignedData>();
+        OnColorAssigned?.Invoke(data);
     }
 
     // 색을 각 클라이언트에 화면에 표시하거나 룰렛 연출 같은 게 있으면 하라는 이벤트
@@ -164,11 +187,15 @@ public class MultiplayManager : IDisposable
         OnShowColor?.Invoke();
     }
 
+    // 서버에서 socket.on('startGame'...)으로 이벤트를 받아와서 처리하는 거로 바꿈. 클라이언트에서 연출시간 조절..
+    // 게임 시작할 때 MultiplayManager.StartGame()을 사용해서 서버로 보낼것.. 
+    
     // 서버쪽 startGameTime 이후 실행 TODO: 필요시 startGameTime 조정
-    private void StartGame(SocketIOResponse response)
-    {
-        OnStartGameEvent?.Invoke();
-    }
+    // 게임 시작할 때 넣어주면 됩니다.
+    // private void StartGame(SocketIOResponse response)
+    // {
+    //     OnStartGame?.Invoke();
+    // }
 
     // 착수된 돌의 정보를 받아오는 이벤트
     private void StonePlaced(SocketIOResponse response)
@@ -232,7 +259,7 @@ public class MultiplayManager : IDisposable
     // TODO:※ 방나갈 때 Dispose 해주기
     private void ExitRoom(SocketIOResponse response)
     {
-        OnExitRoomEvent?.Invoke();
+        OnExitRoom?.Invoke();
     }
 
     private void GameEndedByResign(SocketIOResponse response)
@@ -249,6 +276,11 @@ public class MultiplayManager : IDisposable
     private void WaitingForMatch(SocketIOResponse response) { OnWaitingForMatch?.Invoke(); }
     private void MatchWithAI(SocketIOResponse response) { OnMatchWithAI?.Invoke(); }
     private void MatchmakingCancelled(SocketIOResponse response) { OnMatchmakingCancelled?.Invoke(); } // TODO:※ 매칭 취소 할 시 Dispose 해주기
+
+    public void StartGame()
+    {
+        _socket.Emit("startGame");
+    }
     
     public void LeaveRoom(string roomId)
     {
@@ -265,7 +297,7 @@ public class MultiplayManager : IDisposable
         _socket.Emit("cancelMatchmaking");
     }
 
-    // TODO: 돌 색깔 정해서 서버랑 조율, 흑돌(STONE_BLACK: 1), 백돌(STONE_WHITE: 2)
+    // TODO: 돌 색깔 정해서 서버랑 조율, 흑돌(STONE_BLACK: "Black"), 백돌(STONE_WHITE: "White")
     public void SelectColor(int color)
     {
         _socket.Emit("selectColor", color);
