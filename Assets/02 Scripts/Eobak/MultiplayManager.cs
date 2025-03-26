@@ -28,10 +28,12 @@ public class SetColorData
     public string opponentNickname { get; set; }
     [JsonProperty("myColor")]
     public string myColor { get; set; }
+    [JsonProperty("opponentColor")]
+    public string opponentColor { get; set; }
     [JsonProperty("roomId")]
     public string roomId { get; set; }
-    // 매칭 후 서버에서 'setColor' 이벤트를 통해 상대방 닉네임(opponentNickname), 자신의 색깔(myColor), 그리고 방 ID(roomId)를
-    // 초기 방설정 시 받아올 때 사용됩니다.
+    // 매칭 후 서버에서 'setColor' 이벤트를 통해 상대방 닉네임(opponentNickname), 자신의 색깔(myColor), 적 색(opponentColor) 그리고 방 ID(roomId)를 받아오고
+    // 초기 방설정 시 사용됩니다.
 }
 
 public class ResignData
@@ -270,6 +272,7 @@ public class MultiplayManager : IDisposable
     }
 
     // TODO: 필요시 서버 matching.js 파일 matchingTime 수정, 매칭 제한 시간: 60초:60000
+    // TODO: 매칭을 시작할 때 코인 개수가 100 이상인가 체크하기
     // 매칭 시작 버튼 눌렀을 때 코인 체크하고 통과 시켜주세요.
     // 서버에서는 매칭 잡혔을 때 코인 차감하게끔 코드 짜놨습니다.
     public void JoinMatchQueue(string email, int rank, string nickname)
@@ -313,6 +316,7 @@ public class MultiplayManager : IDisposable
         _socket.Emit("rejectDraw");
     }
 
+    // TODO: 재대국을 신청한 쪽이 코인 개수가 100 이상인가 체크하기
     // 재대국 신청 전에 코인(재대국 신청자) 체크하고 통과 시켜주세요.
     // 서버에서는 재대국 수락시 재대국 신청자에게만 코인이 차감되도록 해놨습니다.
     // 코인 이벤트 함수는 따로 만들지 않았습니다.
