@@ -1,15 +1,69 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using _02_Scripts.Eobak;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
-public class RankingResponse
+[Serializable]
+public class ConsumeCoinRequest
 {
-    public List<RankData> ranks;
+    public int amount;
 }
 
-public class RankData
+[Serializable]
+public class ConsumeCoinResponse
+{
+    public string message;
+}
+    
+        
+[Serializable]
+public class RewardAdResponse
+{
+    public string message;
+}
+
+[Serializable]
+public class PurchaseCoinRequest
+{
+    public string purchaseAmount;
+}
+
+[Serializable]
+public class PurchaseCoinResponse
+{
+    public string message;
+}
+
+[Serializable]
+public class GetCoinBalanceResponse
+{
+    public int coins;
+}
+
+// 랭킹
+
+[Serializable]
+public class RankingUser
+{
+    public string nickname;
+    public int rank;
+    public int win;
+    public int lose;
+    public string rankAchievedTime;
+    public int rankingPosition;
+}
+
+[Serializable]
+public class GetRankingResponse
+{
+    public RankingUser[] ranking;
+}
+
+[Serializable]
+public class AddRankingRequest
 {
     public string nickname;
     public int rank;
@@ -17,46 +71,318 @@ public class RankData
     public int lose;
 }
 
-public class NetworkManager : MonoBehaviour
+[Serializable]
+public class AddRankingResponse
 {
-    public void GetRankingData()
-    {
-        StartCoroutine(GetRankingDataCoroutine());
-    }
+    public string message;
+}
 
-    IEnumerator GetRankingDataCoroutine()
+
+public class NetworkManager : Singleton<NetworkManager>
+{
+    #region 코인
+    private IEnumerator ConsumeCoinCoroutine(int amount, Action<ConsumeCoinResponse> success, Action<string> failure)
     {
-        using (UnityWebRequest webRequest = UnityWebRequest.Get(Constants.ServerURL + "/ranking"))
+        if (string.IsNullOrEmpty(PlayerPrefs.GetString("sid")))
         {
-            // 헤더에 인증 정보 추가 (세션 쿠키)
-            string sid = PlayerPrefs.GetString("sid", "");
-            if(!string.IsNullOrEmpty(sid))
-            {
-                webRequest.SetRequestHeader("Cookie", sid);
-            }
+            failure?.Invoke("로그인이 필요합니다.");
+            yield break;
+        }
 
-            yield return webRequest.SendWebRequest();
+        ConsumeCoinRequest requestData = new ConsumeCoinRequest { amount = amount };
+        string jsonString = JsonUtility.ToJson(requestData);
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonString);
 
-            if (webRequest.result == UnityWebRequest.Result.Success)
+        using (UnityWebRequest www = new UnityWebRequest(Constants.ServerURL + "/coin/consume", UnityWebRequest.kHttpVerbPOST))
+        {
+            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));
+
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
-                string json = webRequest.downloadHandler.text;
-                RankingResponse response = JsonUtility.FromJson<RankingResponse>(json);
-                ProcessRankingData(response.ranks);
+                Debug.LogError($"코인 차감 오류: {www.error}");
+                failure?.Invoke(www.error);
             }
             else
             {
-                Debug.LogError("랭킹 데이터 요청 실패: " + webRequest.error);
+                if (www.responseCode == 200)
+                {
+                    ConsumeCoinResponse response = JsonUtility.FromJson<ConsumeCoinResponse>(www.downloadHandler.text);
+                    success?.Invoke(response);
+                }
+                else if (www.responseCode == 400)
+                {
+                    failure?.Invoke(www.downloadHandler.text); // "코인이 부족합니다."
+                }
+                else if (www.responseCode == 401)
+                {
+                    failure?.Invoke("로그인이 필요합니다.");
+                }
+                else
+                {
+                    failure?.Invoke($"서버 오류: {www.responseCode}");
+                }
             }
         }
     }
 
-    public void ProcessRankingData(List<RankData> ranks)
+    public void ConsumeCoin(int amount, Action<ConsumeCoinResponse> success, Action<string> failure)
     {
-        // 받아온 랭킹 데이터 처리
-        foreach (var rank in ranks)
+        Instance.StartCoroutine(ConsumeCoinCoroutine(amount, success, failure));
+    }
+
+    private IEnumerator RewardAdCoroutine(Action<RewardAdResponse> success, Action<string> failure)
+    {
+        if (string.IsNullOrEmpty(PlayerPrefs.GetString("sid")))
         {
-            Debug.Log($"닉네임: {rank.nickname}, 랭크: {rank.rank}, 승리: {rank.win}, 패배: {rank.lose}");
-            // UI에 랭킹 정보 표시 등 필요한 작업 수행
+            failure?.Invoke("로그인이 필요합니다.");
+            yield break;
         }
+
+        using (UnityWebRequest www = UnityWebRequest.Post(Constants.ServerURL + "/coin/rewardad", ""))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));
+
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError($"광고 시청 보상 오류: {www.error}");
+                failure?.Invoke(www.error);
+            }
+            else
+            {
+                if (www.responseCode == 200)
+                {
+                    RewardAdResponse response = JsonUtility.FromJson<RewardAdResponse>(www.downloadHandler.text);
+                    success?.Invoke(response);
+                }
+                else if (www.responseCode == 401)
+                {
+                    failure?.Invoke("로그인이 필요합니다.");
+                }
+                else
+                {
+                    failure?.Invoke($"서버 오류: {www.responseCode}");
+                }
+            }
+        }
+    }
+
+    public void RewardAd(Action<RewardAdResponse> success, Action<string> failure)
+    {
+        Instance.StartCoroutine(RewardAdCoroutine(success, failure));
+    }
+
+    private IEnumerator PurchaseCoinCoroutine(string purchaseAmount, Action<PurchaseCoinResponse> success, Action<string> failure)
+    {
+        if (string.IsNullOrEmpty(PlayerPrefs.GetString("sid")))
+        {
+            failure?.Invoke("로그인이 필요합니다.");
+            yield break;
+        }
+
+        PurchaseCoinRequest requestData = new PurchaseCoinRequest { purchaseAmount = purchaseAmount };
+        string jsonString = JsonUtility.ToJson(requestData);
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonString);
+
+        using (UnityWebRequest www = new UnityWebRequest(Constants.ServerURL + "/coin/purchase", UnityWebRequest.kHttpVerbPOST))
+        {
+            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));
+
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError($"코인 구매 오류: {www.error}");
+                failure?.Invoke(www.error);
+            }
+            else
+            {
+                if (www.responseCode == 200)
+                {
+                    PurchaseCoinResponse response = JsonUtility.FromJson<PurchaseCoinResponse>(www.downloadHandler.text);
+                    success?.Invoke(response);
+                }
+                else if (www.responseCode == 400)
+                {
+                    failure?.Invoke(www.downloadHandler.text); // "유효하지 않은 구매 금액입니다." 등
+                }
+                else if (www.responseCode == 401)
+                {
+                    failure?.Invoke("로그인이 필요합니다.");
+                }
+                else
+                {
+                    failure?.Invoke($"서버 오류: {www.responseCode}");
+                }
+            }
+        }
+    }
+
+    public void PurchaseCoin(string purchaseAmount, Action<PurchaseCoinResponse> success, Action<string> failure)
+    {
+        Instance.StartCoroutine(PurchaseCoinCoroutine(purchaseAmount, success, failure));
+    }
+
+    private IEnumerator GetCoinBalanceCoroutine(Action<int> success, Action<string> failure)
+    {
+        if (string.IsNullOrEmpty(PlayerPrefs.GetString("sid")))
+        {
+            failure?.Invoke("로그인이 필요합니다.");
+            yield break;
+        }
+
+        using (UnityWebRequest www = UnityWebRequest.Get(Constants.ServerURL + "/coin/getbalance"))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));
+
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError($"코인 잔액 조회 오류: {www.error}");
+                failure?.Invoke(www.error);
+            }
+            else
+            {
+                if (www.responseCode == 200)
+                {
+                    GetCoinBalanceResponse response = JsonUtility.FromJson<GetCoinBalanceResponse>(www.downloadHandler.text);
+                    success?.Invoke(response.coins);
+                }
+                else if (www.responseCode == 401)
+                {
+                    failure?.Invoke("로그인이 필요합니다.");
+                }
+                else
+                {
+                    failure?.Invoke($"서버 오류: {www.responseCode}");
+                }
+            }
+        }
+    }
+
+    public void GetCoinBalance(Action<int> success, Action<string> failure)
+    {
+        Instance.StartCoroutine(GetCoinBalanceCoroutine(success, failure));
+    }
+
+    #endregion
+
+    #region 랭킹
+
+    private IEnumerator GetRankingCoroutine(Action<RankingUser[]> success, Action<string> failure)
+    {
+        if (string.IsNullOrEmpty(PlayerPrefs.GetString("sid")))
+        {
+            failure?.Invoke("로그인이 필요합니다.");
+            yield break;
+        }
+
+        using (UnityWebRequest www = UnityWebRequest.Get(Constants.ServerURL + "/ranking/getranking"))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));
+
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError($"랭킹 정보 조회 오류: {www.error}");
+                failure?.Invoke(www.error);
+            }
+            else
+            {
+                if (www.responseCode == 200)
+                {
+                    GetRankingResponse response = JsonUtility.FromJson<GetRankingResponse>(www.downloadHandler.text);
+                    success?.Invoke(response.ranking);
+                }
+                else if (www.responseCode == 401)
+                {
+                    failure?.Invoke("로그인이 필요합니다.");
+                }
+                else
+                {
+                    failure?.Invoke($"서버 오류: {www.responseCode}");
+                }
+            }
+        }
+    }
+
+    public void GetRanking(Action<RankingUser[]> success, Action<string> failure)
+    {
+        Instance.StartCoroutine(GetRankingCoroutine(success, failure));
+    }
+
+    private IEnumerator AddRankingCoroutine(string nickname, int rank, int win, int lose, Action<AddRankingResponse> success, Action<string> failure)
+    {
+        if (string.IsNullOrEmpty(PlayerPrefs.GetString("sid")))
+        {
+            failure?.Invoke("로그인이 필요합니다.");
+            yield break;
+        }
+
+        AddRankingRequest requestData = new AddRankingRequest { nickname = nickname, rank = rank, win = win, lose = lose };
+        string jsonString = JsonUtility.ToJson(requestData);
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonString);
+
+        using (UnityWebRequest www = new UnityWebRequest(Constants.ServerURL + "/ranking/addranking", UnityWebRequest.kHttpVerbPOST))
+        {
+            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));
+
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError($"랭킹 추가 오류: {www.error}");
+                failure?.Invoke(www.error);
+            }
+            else
+            {
+                if (www.responseCode == 201)
+                {
+                    AddRankingResponse response = JsonUtility.FromJson<AddRankingResponse>(www.downloadHandler.text);
+                    success?.Invoke(response);
+                }
+                else if (www.responseCode == 400)
+                {
+                    failure?.Invoke(www.downloadHandler.text); // "유효하지 않은 급수입니다." 등
+                }
+                else if (www.responseCode == 401)
+                {
+                    failure?.Invoke("로그인이 필요합니다.");
+                }
+                else
+                {
+                    failure?.Invoke($"서버 오류: {www.responseCode}");
+                }
+            }
+        }
+    }
+
+    public void AddRanking(string nickname, int rank, int win, int lose, Action<AddRankingResponse> success, Action<string> failure)
+    {
+        Instance.StartCoroutine(AddRankingCoroutine(nickname, rank, win, lose, success, failure));
+    }
+
+    #endregion
+
+    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        
     }
 }
