@@ -143,7 +143,7 @@ public class NetworkManager : Singleton<NetworkManager>
             yield break;
         }
 
-        using (UnityWebRequest www = UnityWebRequest.Post(Constants.ServerURL + "/coin/rewardad", ""))
+        using (UnityWebRequest www = UnityWebRequest.PostWwwForm(Constants.ServerURL + "/coin/rewardad", ""))
         {
             www.downloadHandler = new DownloadHandlerBuffer();
             www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));

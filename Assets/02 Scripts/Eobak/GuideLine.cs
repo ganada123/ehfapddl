@@ -35,7 +35,7 @@ namespace _02_Scripts.Eobak
                 (error) => { Debug.LogError($"랭킹 정보 조회 실패: {error}"); });
 
             // 랭킹 추가 예시
-            NetworkManager.Instance.AddRanking("새로운유저", 3, 5, 1,
+            NetworkManager.Instance.AddRanking("새로추가할유저이름01", 3, 5, 1,
                 (response) => { Debug.Log($"랭킹 추가 성공: {response.message}"); },
                 (error) => { Debug.LogError($"랭킹 추가 실패: {error}"); });
         }
