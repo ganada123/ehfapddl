@@ -58,6 +58,8 @@ public class ImageOutLineToggle : MonoBehaviour
                 Debug.LogWarning(gameObject.name + "의 Image 컴포넌트에 Sprite가 할당되지 않음");
             }
         }
+
+        Debug.LogWarning(gameObject.name + " 선택되지 않음");
         return null;
     }
 
