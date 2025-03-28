@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +7,6 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 // 준석님 메서드 사용
-// Board                    보드 15x15 배열
 // board.CheckWin           승패판정
 // board.PlaceMove          돌 두기
 // board.IsValidMoves       돌을 둘 수 있는 좌표 List<(int,int)> 반환
@@ -21,16 +21,17 @@ public class AIController
     private const int MAX_DEPTH_HARD = 4;
     private const int MAX_DEPTH_EXPERT = 6; // 느려질 수 있음
     
-    private int aiPlayer = 1;  // AI 돌
-    private int humanPlayer = -1;  // 사용자 돌
+    private int humanPlayer = 1;  // 사용자 돌
+    private int aiPlayer = 2;  // AI 돌
     private int difficulty; // 난이도 (1: Easy, 2: Medium, 3: Hard, 4: Expert)
 
+    
     public AIController(int difficultyLevel)
     {
         difficulty = difficultyLevel;
     }
 
-    public (int, int) GetBestMove(Board board)
+    public (int, int) GetBestMove(int[,] board)
     {
         if (difficulty == 1) return MinimaxBestMove(board, MAX_DEPTH_EASY);
         if (difficulty == 2) return MinimaxBestMove(board, MAX_DEPTH_MEDIUM);
@@ -45,27 +46,29 @@ public class AIController
     /// </summary>
     /// <param name="board"></param>
     /// <returns></returns>
-    private (int, int) GetRandomMove(Board board)
+    private (int, int) GetRandomMove(int[,] board)
     {
-        var moves = board.IsValidMoves();
+        /*var moves = board.IsValidMoves();
         
-        // 금수 필터링
-        moves.RemoveAll(move => board.IsForbiddenMove(move.Item1, move.Item2, aiPlayer));
+        /#3#/ 금수 필터링
+        moves.RemoveAll(move => board.IsForbiddenMove(move.Item1, move.Item2, aiPlayer));#3#
         
         if (moves.Count == 0) return (-1, -1);
 
         int index = Random.Range(0, moves.Count);
-        return moves[index];
+        
+        return moves[index];#1#
+        return (0, 0);
     }
 
     // 모든 범위를 탐색하지 않고, 기존에 놓인 돌을 기준으로 2칸 이내만 탐색
     // 탐색량을 줄여 탐색 속도를 높임
-    private List<(int, int)> GetNearbyMoves(Board board)
+    private List<(int, int)> GetNearbyMoves(int[,] board)
     {
         HashSet<(int, int)> nearby = new HashSet<(int, int)>();
-        for (int x = 0; x < board.SIZE; x++)
+        for (int x = 0; x < board.GetLength(0); x++)
         {
-            for (int y = 0; y < board.SIZE; y++)
+            for (int y = 0; y < board.GetLength(0); y++)
             {
                 if (board[x, y] != 0)
                 {
@@ -75,13 +78,9 @@ public class AIController
                         {
                             int nx = x + dx;
                             int ny = y + dy;
-                            if (nx >= 0 && ny >= 0 && nx < board.SIZE && ny < board.SIZE && board[nx, ny] == 0)
+                            if (nx >= 0 && ny >= 0 && nx < board.GetLength(0) && ny < board.GetLength(0) && board[nx, ny] == 0)
                             {
-                                // 금수 체크 추가
-                                if (!board.IsForbiddenMove(nx, ny, aiPlayer))
-                                {
-                                    nearby.Add((nx, ny));
-                                }
+                                nearby.Add((nx, ny));
                             }
                         }
                     }
@@ -92,15 +91,15 @@ public class AIController
         return new List<(int, int)>(nearby);
     }
     
-    private bool GameWin(Board board, (int, int) move, int player)
+    private bool GameWin(int[,] board, (int, int) move, int player)
     {
-        board.PlaceMove(move.Item1, move.Item2, player);
-        bool win = board.CheckWin(player);
-        board.PlaceMove(move.Item1, move.Item2, 0);
+        GameManager.Instance.PlaceStone(move.Item1, move.Item2, player);
+        bool win = board.CheckWin(move.Item1, move.Item2);
+        GameManager.Instance.PlaceStone(move.Item1, move.Item2, 0);
         return win;
     }
     
-    private (int, int) MinimaxBestMove(Board board, int depth)
+    private (int, int) MinimaxBestMove(int[,] board, int depth)
     {
         int bestScore = int.MinValue;
         (int, int) bestMove = (-1, -1);
@@ -115,9 +114,9 @@ public class AIController
         
         foreach (var move in moves)
         {
-            board.PlaceMove(move.Item1, move.Item2, aiPlayer);
+            GameManager.Instance.PlaceStone(move.Item1, move.Item2, aiPlayer);
             int score = Minimax(board, depth, false, int.MinValue, int.MaxValue);
-            board.PlaceMove(move.Item1, move.Item2, 0);
+            GameManager.Instance.PlaceStone(move.Item1, move.Item2, 0);
 
             if (score > bestScore)
             {
@@ -128,11 +127,12 @@ public class AIController
         return bestMove;
     }
 
-    private int Minimax(Board board, int depth, bool isMaximizing, int alpha, int beta)
+    private int Minimax(int[,] board, int depth, bool isMaximizing, int alpha, int beta)
     {
-        // TODO: 무승부 처리 필요
+        /#1#/ TODO: 무승부 처리 필요
         if (board.IsValidMoves().Count == 0)
             return 0;
+            #1#
         
         if (board.CheckWin(aiPlayer))
             return int.MaxValue - depth;
@@ -157,9 +157,9 @@ public class AIController
             int maxEval = int.MinValue;
             foreach (var move in moves)
             {
-                board.PlaceMove(move.Item1, move.Item2, aiPlayer);
+                GameManager.Instance.PlaceStone(move.Item1, move.Item2, aiPlayer);
                 int eval = Minimax(board, depth - 1, false, alpha, beta);
-                board.PlaceMove(move.Item1, move.Item2, 0);
+                GameManager.Instance.PlaceStone(move.Item1, move.Item2, 0);
 
                 maxEval = Math.Max(maxEval, eval);
                 alpha = Math.Max(alpha, eval);
@@ -172,9 +172,9 @@ public class AIController
             int minEval = int.MaxValue;
             foreach (var move in moves)
             {
-                board.PlaceMove(move.Item1, move.Item2, humanPlayer);
+                GameManager.Instance.PlaceStone(move.Item1, move.Item2, humanPlayer);
                 int eval = Minimax(board, depth - 1, true, alpha, beta);
-                board.PlaceMove(move.Item1, move.Item2, 0);
+                GameManager.Instance.PlaceStone(move.Item1, move.Item2, 0);
 
                 minEval = Math.Min(minEval, eval);
                 beta = Math.Min(beta, eval);
@@ -184,26 +184,26 @@ public class AIController
         }
     }
 
-    private int EvaluateMove(Board board, (int, int) move, int player)
+    private int EvaluateMove(int[,] board, (int, int) move, int player)
     {
-        board.PlaceMove(move.Item1, move.Item2, player);
+        GameManager.Instance.PlaceStone(move.Item1, move.Item2, player);
         int score = EvaluateBoard(board);
-        board.PlaceMove(move.Item1, move.Item2, 0);
+        GameManager.Instance.PlaceStone(move.Item1, move.Item2, 0);
         return score;
     }
     
-    private int EvaluateBoard(Board board)
+    private int EvaluateBoard(int[,] board)
     {
         return EvaluatePlayer(board, aiPlayer) - EvaluatePlayer(board, humanPlayer);
     }
     
-    private int EvaluatePlayer(Board board, int player)
+    private int EvaluatePlayer(int[,] board, int player)
     {
         int score = 0;
         
-        for (int x = 0; x < board.SIZE; x++)
+        for (int x = 0; x < board.GetLength(0); x++)
         {
-            for (int y = 0; y < board.SIZE; y++)
+            for (int y = 0; y < board.GetLength(0); y++)
             {
                 score += EvaluateDirection(board, x, y, 1, 0, player); // 가로
                 score += EvaluateDirection(board, x, y, 0, 1, player); // 세로
@@ -214,9 +214,9 @@ public class AIController
         return score;
     }
     
-    private int EvaluateDirection(Board board, int x, int y, int dx, int dy, int player)
+    private int EvaluateDirection(int[,] board, int x, int y, int dx, int dy, int player)
     {
-        int size = board.SIZE;
+        int size = board.GetLength(0);
         int[] line = new int[7];
 
         for (int i = -1; i <= 5; i++)
@@ -239,8 +239,17 @@ public class AIController
         // TODO: 쌍삼의 경우 단방향 패턴 검사인 PatternScore가 아닌 모든 방향에 대해 검사하는 EvaluatePlayer에서 추가해야 할 것으로 보임
         // TODO: 가중치 수정 필요!!!
         // 가중치에 따라 엉망이 될 수도 있음...
+
+        int enemy=0;
         
-        int enemy = -player;
+        if (player == 1)
+        {
+            enemy = 2;
+        }
+        else if (player == 2)
+        {
+            enemy = 1;
+        }
 
         // 열린 4: 0 P P P P 0
         if (line[0] == 0 && line[1] == player && line[2] == player && line[3] == player && line[4] == player && line[5] == 0)
@@ -283,3 +292,4 @@ public class AIController
         return 0;
     }
 }
+*/

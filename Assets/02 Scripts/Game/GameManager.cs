@@ -1,13 +1,12 @@
-using System.Collections;
+/*using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
-    public static GameManager Instance;
-
     public GameObject[] omokPoints;
     public GameObject cursorPrefab;
     public GameObject forbiddenPrefab;
@@ -19,6 +18,7 @@ public class GameManager : MonoBehaviour
     private GameObject currentCursor;
     private GameObject selectedPoint;
     private int currentPlayer = 1; // 1: 흑돌, 2: 백돌
+    private (int, int) aiPoint = (0, 0);
 
     private int[,] boardState = new int[15, 15];
     private GameObject[,] forbiddenMarkers = new GameObject[15, 15];
@@ -32,6 +32,9 @@ public class GameManager : MonoBehaviour
     public AudioSource audioSource; // 소리를 재생할 AudioSource
     public AudioClip placeStoneClip; // 돌을 놓을 때 사운드
     public AudioClip tickTockClip; // 5초 이하일 때 틱톡 사운드
+
+    private bool isSimulate;
+    private bool isPlayer=true;
     
     private readonly Vector2Int[] directions = {
         new Vector2Int(1, 0),  // 가로 (→)
@@ -39,13 +42,10 @@ public class GameManager : MonoBehaviour
         new Vector2Int(1, 1),  // 대각선 ↘
         new Vector2Int(1, -1)  // 대각선 ↙
     };
-    
-    void Awake()
+
+    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (Instance == null)
-            Instance = this;
-        else
-            Destroy(gameObject);
+        throw new System.NotImplementedException();
     }
 
     void Start()
@@ -89,12 +89,20 @@ public class GameManager : MonoBehaviour
 
     public void PlaceStone()
     {
+        int x, y;
         if (selectedPoint == null) return;
-
-        Point pointScript = selectedPoint.GetComponent<Point>();
-        int x = pointScript.x;
-        int y = pointScript.y;
-
+        if (isPlayer)
+        {
+            Point pointScript = selectedPoint.GetComponent<Point>();
+            x = pointScript.x;
+            y = pointScript.y;
+        }
+        else
+        {
+            x = aiPoint.Item1;
+            y = aiPoint.Item2;
+        }
+        
         if (currentPlayer == 1 && IsForbidden(x, y))
         {
             return;
@@ -132,9 +140,20 @@ public class GameManager : MonoBehaviour
         PrintBoardState();
     }
 
+    public void PlaceStone(int x, int y, int player)
+    {
+        boardState[x, y] = player;
+        isSimulate = true;
+    }
+
     private void SwitchTurn()
     {
         currentPlayer = (currentPlayer == 1) ? 2 : 1;
+        if (!isPlayer && currentPlayer == 2)
+        {
+            aiPoint = AIController.GetBestMove(boardState);
+            PlaceStone();
+        }
         UpdateTurnUI();
         RestartTurnTimer(); // ⏳ 턴이 바뀌면 타이머 다시 시작
     }
@@ -234,13 +253,13 @@ public class GameManager : MonoBehaviour
 
         if (isDoubleThree && isDoubleFour)
         {
-            /*Debug.Log($"[{x}, {y}] 삼삼 + 사사 발생 → 금수 아님");*/
+            /*Debug.Log($"[{x}, {y}] 삼삼 + 사사 발생 → 금수 아님");#1#
             return false;
         }
 
         /*if (isDoubleThree) Debug.Log($"[{x}, {y}] 삼삼 금수 감지!");
         if (isDoubleFour) Debug.Log($"[{x}, {y}] 사사 금수 감지!");
-        if (isOverline) Debug.Log($"[{x}, {y}] 장목 금수 감지!");*/
+        if (isOverline) Debug.Log($"[{x}, {y}] 장목 금수 감지!");#1#
 
         return isDoubleThree || isDoubleFour || isOverline;
     }
@@ -254,28 +273,28 @@ public class GameManager : MonoBehaviour
         };
 
         // **가상의 착수**
-        boardState[x, y] = 1; 
+        boardState[x, y] = 1;
 
-        /*Debug.Log($"[{x}, {y}]에 가상의 흑돌 착수 후 검사 시작");*/
+        /*Debug.Log($"[{x}, {y}]에 가상의 흑돌 착수 후 검사 시작");#1#
 
         foreach (Vector2Int dir in directions)
         {
             if (CountOpenThree(x, y, dir))
             {
                 openThreeCount++;
-                /*Debug.Log($"[삼삼 감지] ({x}, {y}) 방향 {dir} → 열린 삼(33) 발견!");*/
+                /*Debug.Log($"[삼삼 감지] ({x}, {y}) 방향 {dir} → 열린 삼(33) 발견!");#1#
             }
         }
 
         // **원상복구**
         boardState[x, y] = 0; 
 
-        /*Debug.Log($"[{x}, {y}] 검사 후 원상복구 완료, openThreeCount = {openThreeCount}");*/
+        /*Debug.Log($"[{x}, {y}] 검사 후 원상복구 완료, openThreeCount = {openThreeCount}");#1#
 
         bool isDoubleThree = openThreeCount >= 2;
         if (isDoubleThree)
         {
-            /*Debug.Log($"[{x}, {y}] 금수 (삼삼) 판정됨!");*/
+            /*Debug.Log($"[{x}, {y}] 금수 (삼삼) 판정됨!");#1#
         }
 
         return isDoubleThree;
@@ -329,7 +348,7 @@ public class GameManager : MonoBehaviour
         // **열린 형태 확인을 위해 양끝에 0 추가**
         result = "0" + result + "0";
 
-        /*Debug.Log($"[{x}, {y}] 방향 {dir} → 검사된 문자열: {result}");*/
+        /*Debug.Log($"[{x}, {y}] 방향 {dir} → 검사된 문자열: {result}");#1#
 
         return result;
     }
@@ -446,16 +465,16 @@ public class GameManager : MonoBehaviour
             // 🔽 역방향 탐색
             count += CountStones(x, y, -dir, player);
 
-            if (count >= 5) // 5개 이상이면 승리
+            if (count >= 5 ) // 5개 이상이면 승리
             {
                 Debug.Log($"🎉 플레이어 {player} 승리! ({(player == 1 ? "흑돌" : "백돌")})");
                 EndGame(player);
                 return true;
             }
         }
-
         return false;
     }
+    
     // 🚀 특정 방향으로 연속된 돌 개수 세기
     private int CountStones(int x, int y, Vector2Int dir, int player)
     {
@@ -492,4 +511,4 @@ public class GameManager : MonoBehaviour
             StopCoroutine(turnTimerCoroutine);
         }
     }
-}
+}*/
