@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class SigninController : MonoBehaviour
 {
-    [SerializeField] private TMP_InputField passwordInputField; // TMPÀÇ InputField
+    [SerializeField] private TMP_InputField passwordInputField;
     [SerializeField] private GameObject signinPanel;
+    [SerializeField] private GameObject signupPanel;
+    [SerializeField] private GameObject selectImagePanel;
     private bool isPasswordVisible = false;
 
     public void TogglePasswordVisible()
@@ -21,7 +23,7 @@ public class SigninController : MonoBehaviour
         }
 
         isPasswordVisible = !isPasswordVisible;
-        passwordInputField.ForceLabelUpdate(); // º¯°æµÈ ³»¿ë Àû¿ë
+        passwordInputField.ForceLabelUpdate(); // ë³€ê²½ëœ ë‚´ìš© ì ìš©
     }
 
     public void OnClickSigninButton()
@@ -32,7 +34,55 @@ public class SigninController : MonoBehaviour
         }
         else
         {
-            Debug.Log("signinPanelÀÌ ÇÒ´çµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.Log("signinPanelì´ í• ë‹¹ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
+        }
+    }
+
+    public void OnClickSignupButton()
+    {
+        if (signupPanel != null)
+        {
+            signupPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("signupPanelï¿½ï¿½ ï¿½Ò´ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾Ò½ï¿½ï¿½Ï´ï¿½.");
+        }
+    }
+
+    public void OnClickSignupConfirmButton()
+    {
+        if (signupPanel != null)
+        {
+            signupPanel.SetActive(false);
+        }
+        else
+        {
+            Debug.Log("signupPanelï¿½ï¿½ ï¿½Ò´ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾Ò½ï¿½ï¿½Ï´ï¿½.");
+        }
+    }
+
+    public void OnClickProfileButton()
+    {
+        if(selectImagePanel != null)
+        {
+            selectImagePanel.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("selectImagePanelï¿½ï¿½ ï¿½Ò´ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾Ò½ï¿½ï¿½Ï´ï¿½.");
+        }
+    }
+
+    public void OnClickCancelButton()
+    {
+        if(selectImagePanel != null)
+        {
+            selectImagePanel.SetActive(false);
+        }
+        else
+        {
+            Debug.Log("selectImagePanelï¿½ï¿½ ï¿½Ò´ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾Ò½ï¿½ï¿½Ï´ï¿½.");
         }
     }
 }
