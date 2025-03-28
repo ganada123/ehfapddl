@@ -1,20 +1,11 @@
-using System;
 using System.Collections;
-<<<<<<< HEAD
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
-=======
-using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
-using UnityEngine.SceneManagement;
->>>>>>> b238b2c3069e97c0504a999b7854c9abea704e4d
 
-public class GameManager : Singleton<GameManager>
+public class GameManager : MonoBehaviour
 {
-<<<<<<< HEAD
     public static GameManager Instance;
 
     public GameObject[] omokPoints;
@@ -50,31 +41,14 @@ public class GameManager : Singleton<GameManager>
     };
     
     void Awake()
-=======
-    public GameObject[] omokPoints;  // 바둑판 위의 접점들
-    public int boardSize = 15;  // 15x15 바둑판 크기
-    private int currentPlayer = 1;  // 1: 흑돌, 2: 백돌
-    
-    [NonSerialized]public int indexGameManager = 0;
-    [NonSerialized]public int maxIndexGameManager = 0;
-
-    //public static GameManager Instance { get; private set; }  // 싱글턴 인스턴스
-    /*void Awake()
->>>>>>> b238b2c3069e97c0504a999b7854c9abea704e4d
     {
         if (Instance == null)
             Instance = this;
         else
             Destroy(gameObject);
-<<<<<<< HEAD
     }
-=======
-            return;
-        }
-    }*/
->>>>>>> b238b2c3069e97c0504a999b7854c9abea704e4d
 
-    /*void Start()
+    void Start()
     {
         omokPoints = new GameObject[225];
 
@@ -250,7 +224,7 @@ public class GameManager : Singleton<GameManager>
                 }
             }
         }
-    }*/
+    }
 
     private bool IsForbidden(int x, int y)
     {
@@ -307,7 +281,6 @@ public class GameManager : Singleton<GameManager>
         return isDoubleThree;
     }
     
-<<<<<<< HEAD
     private bool CountOpenThree(int x, int y, Vector2Int dir)
     {
         string line = GetExtendedLine(x, y, dir, 5); // 더 긴 범위 체크
@@ -520,23 +493,3 @@ public class GameManager : Singleton<GameManager>
         }
     }
 }
-=======
-    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (scene.name == "GoListMain")
-        {
-            var replayManager = GameObject.FindObjectOfType<ReplayManager>();
-            replayManager.index = indexGameManager;
-        }
-
-        /*if (scene.name == "List")
-        {
-            var replayManager = GameObject.FindObjectOfType<ReplayManager>();
-            var cell = GameObject.FindObjectOfType<Cell>();
-            replayManager.index = cell.Index;
-        }*/
-        
-    }
-    
-}
->>>>>>> b238b2c3069e97c0504a999b7854c9abea704e4d
