@@ -6,6 +6,17 @@ using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
+    /// <summary>
+    /// TODO: indexGameManager 구현 | OnButtonClicked함수에서도 수정해야함
+    /// path 도 구현
+    /// </summary>
+    public int indexGameManager = 0;
+    public string path = "";
+    public int maxIndexGameManager = 0;
+    /// <summary>
+    /// TODO: 구현후 제거해주세요!! ⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳
+    /// </summary>
+    /// 
     public static GameManager Instance;
 
     public GameObject[] omokPoints;

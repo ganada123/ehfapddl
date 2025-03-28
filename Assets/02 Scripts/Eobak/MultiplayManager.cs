@@ -104,7 +104,11 @@ public class DisconnectedData
 public class MultiplayManager : IDisposable
 {
     private SocketIOUnity _socket;
-    private event Action<Constants.MultiplayManagerState, string> _onMultiplayStateChanged;
+    /// <summary>
+    /// TODO: 오류수정을 위한 Constants.MultiplayManagerState -> _02_Scripts.Eobak.Constants.MultiplayManagerState로 수정했습니다.
+    /// 이후에 수정 부탁드립니다.
+    /// </summary>
+    private event Action<_02_Scripts.Eobak.Constants.MultiplayManagerState, string> _onMultiplayStateChanged;
 
     public Action<RoomIdData> OnRoomCreatedForMatch;                // 매치를 위한 방 생성 완료 이벤트
     public Action<SetColorData> OnSetColor;                         // 색을 받아올 때 이벤트
@@ -126,7 +130,11 @@ public class MultiplayManager : IDisposable
     public Action OnMatchWithAI;                                    // AI와 매칭되었을 때 이벤트
     public Action OnMatchmakingCancelled;                           // 매칭이 취소되었을 때 이벤트
 
-    public MultiplayManager(Action<Constants.MultiplayManagerState, string> onMultiplayStateChanged)
+    /// <summary>
+    /// TODO: 오류수정을 위한 Constants.MultiplayManagerState -> _02_Scripts.Eobak.Constants.MultiplayManagerState로 수정했습니다.
+    /// 이후에 수정 부탁드립니다.
+    /// </summary>
+    public MultiplayManager(Action<_02_Scripts.Eobak.Constants.MultiplayManagerState, string> onMultiplayStateChanged)
     {
         _onMultiplayStateChanged = onMultiplayStateChanged;
 
