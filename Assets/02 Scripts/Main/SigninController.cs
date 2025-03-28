@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class SigninController : MonoBehaviour
 {
-    [SerializeField] private TMP_InputField passwordInputField; // TMP의 InputField
+    [SerializeField] private TMP_InputField passwordInputField;
     [SerializeField] private GameObject signinPanel;
+    [SerializeField] private GameObject signupPanel;
+    [SerializeField] private GameObject selectImagePanel;
     private bool isPasswordVisible = false;
 
     public void TogglePasswordVisible()
@@ -33,6 +35,54 @@ public class SigninController : MonoBehaviour
         else
         {
             Debug.Log("signinPanel이 할당되지 않았습니다.");
+        }
+    }
+
+    public void OnClickSignupButton()
+    {
+        if (signupPanel != null)
+        {
+            signupPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("signupPanel�� �Ҵ���� �ʾҽ��ϴ�.");
+        }
+    }
+
+    public void OnClickSignupConfirmButton()
+    {
+        if (signupPanel != null)
+        {
+            signupPanel.SetActive(false);
+        }
+        else
+        {
+            Debug.Log("signupPanel�� �Ҵ���� �ʾҽ��ϴ�.");
+        }
+    }
+
+    public void OnClickProfileButton()
+    {
+        if(selectImagePanel != null)
+        {
+            selectImagePanel.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("selectImagePanel�� �Ҵ���� �ʾҽ��ϴ�.");
+        }
+    }
+
+    public void OnClickCancelButton()
+    {
+        if(selectImagePanel != null)
+        {
+            selectImagePanel.SetActive(false);
+        }
+        else
+        {
+            Debug.Log("selectImagePanel�� �Ҵ���� �ʾҽ��ϴ�.");
         }
     }
 }
