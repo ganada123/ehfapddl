@@ -10,6 +10,7 @@ using Random = UnityEngine.Random;
 // board.CheckWin           승패판정
 // board.PlaceMove          돌 두기
 // board.IsValidMoves       돌을 둘 수 있는 좌표 List<(int,int)> 반환
+// board.IsForbiddenMove    금수 위치
 
 // PatternScore의 경우 준석님 것이 있으면 그것을 사용
 
@@ -47,6 +48,10 @@ public class AIController
     private (int, int) GetRandomMove(Board board)
     {
         var moves = board.IsValidMoves();
+        
+        // 금수 필터링
+        moves.RemoveAll(move => board.IsForbiddenMove(move.Item1, move.Item2, aiPlayer));
+        
         if (moves.Count == 0) return (-1, -1);
 
         int index = Random.Range(0, moves.Count);
@@ -71,7 +76,13 @@ public class AIController
                             int nx = x + dx;
                             int ny = y + dy;
                             if (nx >= 0 && ny >= 0 && nx < board.SIZE && ny < board.SIZE && board[nx, ny] == 0)
-                                nearby.Add((nx, ny));
+                            {
+                                // 금수 체크 추가
+                                if (!board.IsForbiddenMove(nx, ny, aiPlayer))
+                                {
+                                    nearby.Add((nx, ny));
+                                }
+                            }
                         }
                     }
                 }
@@ -214,7 +225,7 @@ public class AIController
             int ny = y + i * dy;
 
             if (nx < 0 || ny < 0 || nx >= size || ny >= size)
-                line[i + 1] = -99;
+                line[i + 1] = -99;  // 보드 바깥(해당 패턴 무효)
             else
                 line[i + 1] = board[nx, ny];
         }
@@ -241,7 +252,9 @@ public class AIController
 
         // 닫힌 4: X P P P P 0 or 0 P P P P X
         if ((line[0] == enemy && line[1] == player && line[2] == player && line[3] == player && line[4] == player && line[5] == 0) ||
-            (line[0] == 0 && line[1] == player && line[2] == player && line[3] == player && line[4] == player && line[5] == enemy))
+            (line[0] == 0 && line[1] == player && line[2] == player && line[3] == player && line[4] == player && line[5] == enemy) ||
+            (line[0] == enemy && line[1] == player && line[2] == player && line[3] == player && line[4] == player && line[5] == -99) ||
+            (line[0] == -99 && line[1] == player && line[2] == player && line[3] == player && line[4] == player && line[5] == enemy))
             return 1000;
 
         // 열린 비연속 3: 0 P P 0 P 0
@@ -258,7 +271,9 @@ public class AIController
 
         // 닫힌 3: X P P P 0 or 0 P P P X
         if ((line[1] == enemy && line[2] == player && line[3] == player && line[4] == player && line[5] == 0) ||
-            (line[1] == 0 && line[2] == player && line[3] == player && line[4] == player && line[5] == enemy))
+            (line[1] == 0 && line[2] == player && line[3] == player && line[4] == player && line[5] == enemy) ||
+            (line[1] == enemy && line[2] == player && line[3] == player && line[4] == player && line[5] == -99) ||
+            (line[1] == -99 && line[2] == player && line[3] == player && line[4] == player && line[5] == enemy))
             return 100;
 
         // 열린 2: 0 P P 0
