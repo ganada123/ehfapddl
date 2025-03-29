@@ -1,8 +1,9 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
-public class Point : MonoBehaviour, IPointerClickHandler
+public class Point : MonoBehaviour
 {
     public Sprite emptySprite;
     public Sprite blackStoneSprite;
@@ -10,33 +11,32 @@ public class Point : MonoBehaviour, IPointerClickHandler
 
     private Image imageComponent;
     private bool isOccupied = false;
-    
-    public int x, y; // 바둑판 좌표 저장
 
     void Start()
     {
         imageComponent = GetComponent<Image>();
-        if (imageComponent != null)
-            imageComponent.sprite = emptySprite;
+        if (imageComponent == null)
+        {
+            Debug.LogError($"{gameObject.name}에 Image 컴포넌트가 없습니다!");
+            return;
+        }
+        imageComponent.sprite = emptySprite;
+
+        // ✅ 버튼 이벤트 추가
+        Button button = GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.AddListener(() => OnClick(GameManager.Instance.GetCurrentPlayer()));
+        }
     }
 
-    public bool IsOccupied()
+    public void OnClick(int playerTurn)
     {
-        return isOccupied;
-    }
-
-    public void PlaceStone(int player)
-    {
-        if (isOccupied) return;
-
-        isOccupied = true;
-        imageComponent.sprite = (player == 1) ? blackStoneSprite : whiteStoneSprite;
-        
-        /*Debug.Log($"Point 위치: ({x}, {y})"); // 디버깅용 로그*/
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        GameManager.Instance.SelectPoint(gameObject);
+        if (!isOccupied)
+        {
+            isOccupied = true;
+            imageComponent.sprite = (playerTurn == 1) ? blackStoneSprite : whiteStoneSprite;
+            GameManager.Instance.ChangeTurn();
+        }
     }
 }
