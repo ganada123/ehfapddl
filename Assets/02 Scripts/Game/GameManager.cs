@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviour
             PlaySound(placeStoneClip);
 
             // ✅ **오목 승리 체크**
-            if (board.CheckWin(currentPlayer))
+            if (CheckWin(currentPlayer))
             {
                 return; // 승리 시 턴을 넘기지 않고 종료
             }
@@ -456,9 +456,9 @@ public class GameManager : MonoBehaviour
     }
 
     // AIController에서 호출할 승리 판정 메서드 (AI 플레이어: 1)
-    public bool CheckWinForAI(int player)
+    public bool CheckWin(int player)
     {
-        Debug.Log($"CheckWinForAI Called for player: {player} ({(player == 1 ? "백돌" : "흑돌")})"); // ◀◀◀ 추가
+        Debug.Log($"CheckWin Called for player: {player} ({(player == 1 ? "백돌" : "흑돌")})"); // ◀◀◀ 추가
         int internalPlayer = (player == 1) ? 1 : -1; // AIController의 플레이어 표현에 맞춤
         for (int x = 0; x < 15; x++)
         {
@@ -473,7 +473,7 @@ public class GameManager : MonoBehaviour
                         count += CountStonesInternal(x, y, -dir, internalPlayer);
                         if (count >= 5)
                         {
-                            Debug.Log($"🎉 CheckWinForAI: 플레이어 {player} 승리! ({(player == 1 ? "백돌" : "흑돌")}) at ({x}, {y})"); // ◀◀◀ 추가
+                            Debug.Log($"🎉 CheckWin: 플레이어 {player} 승리! ({(player == 1 ? "백돌" : "흑돌")}) at ({x}, {y})"); // ◀◀◀ 추가
                             EndGame(internalPlayer);
                             return true;
                         }
@@ -483,25 +483,7 @@ public class GameManager : MonoBehaviour
         }
         return false;
     }
-
-    private bool CheckWin(int x, int y) // 기존 PlaceStone에서 사용하던 CheckWin (더 이상 직접 사용 안 함)
-    {
-        int player = boardStateInternal[x, y];
-        Debug.Log($"CheckWin Called at ({x}, {y}) for player: {(player == -1 ? "흑돌" : "백돌")}"); // ◀◀◀ 추가
-        foreach (Vector2Int dir in directions)
-        {
-            int count = 1;
-            count += CountStonesInternal(x, y, dir, player);
-            count += CountStonesInternal(x, y, -dir, player);
-            if (count >= 5)
-            {
-                Debug.Log($"🎉 CheckWin: 플레이어 {(player == -1 ? "흑돌" : "백돌")} 승리! at ({x}, {y})"); // ◀◀◀ 추가
-                EndGame(player == -1 ? -1 : 1); // EndGame에 AI 플레이어 표현 맞춰 전달
-                return true;
-            }
-        }
-        return false;
-    }
+    
 
     // 내부적으로 돌 개수를 세는 메서드
     private int CountStonesInternal(int x, int y, Vector2Int dir, int player)
@@ -579,6 +561,9 @@ public class GameManager : MonoBehaviour
         }
 
         // AI의 턴이 끝났으므로 다시 사용자에게 턴을 넘깁니다.
-        SwitchTurn(); // ◀◀◀ 추가
+        if (!CheckWin(currentPlayer))  // AI가 이기지 않았으면 턴 넘긴다
+        {
+            SwitchTurn(); 
+        }
     }
 }

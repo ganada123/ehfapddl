@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 
 // 준석님 메서드 사용
 // Board                    보드 15x15 배열
-// board.CheckWin           승패판정
+// board.CheckWinforAI           승패판정
 // board.PlaceMove          돌 두기
 // board.IsValidMoves       돌을 둘 수 있는 좌표 List<(int,int)> 반환
 // board.IsForbiddenMove    금수 위치
@@ -95,7 +95,7 @@ public class AIController
     private bool GameWin(Board board, (int, int) move, int player)
     {
         board.PlaceMove(move.Item1, move.Item2, player);
-        bool win = board.CheckWin(player);
+        bool win = board.CheckWinforAI(player);
         board.PlaceMove(move.Item1, move.Item2, 0);
         return win;
     }
@@ -134,10 +134,10 @@ public class AIController
         if (board.IsValidMoves().Count == 0)
             return 0;
 
-        if (board.CheckWin(aiPlayer))
+        if (board.CheckWinforAI(aiPlayer))
             return int.MaxValue - depth;
 
-        if (board.CheckWin(humanPlayer))
+        if (board.CheckWinforAI(humanPlayer))
             return int.MinValue + depth;
 
         if (depth == 0)

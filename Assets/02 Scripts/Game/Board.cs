@@ -26,11 +26,54 @@ public class Board
         get { return boardState[x, y]; }
         set { boardState[x, y] = value; }
     }
-
-    public bool CheckWin(int player)
+    
+    // AIController에서 쓰이는 CheckWin
+    public bool CheckWinforAI(int player)
     {
-        // GameManager의 CheckWin 메서드 활용 (플레이어 표현 방식에 맞춰 조정)
-        return gameManager.CheckWinForAI(player == 1 ? 1 : -1);
+        for (int x = 0; x < SIZE; x++)
+        {
+            for (int y = 0; y < SIZE; y++)
+            {
+                if (boardState[x, y] == player)
+                {
+                    if (CountFiveStones(x, y, 1, 0, player) >= 5) return true;
+                    if (CountFiveStones(x, y, 0, 1, player) >= 5) return true;
+                    if (CountFiveStones(x, y, 1, 1, player) >= 5) return true;
+                    if (CountFiveStones(x, y, 1, -1, player) >= 5) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private int CountFiveStones(int x, int y, int dx, int dy, int player)
+    {
+        int count = 1;
+        
+        int nx = x + dx;
+        int ny = y + dy;
+        while (IsInBounds(nx, ny) && boardState[nx, ny] == player)
+        {
+            count++;
+            nx += dx;
+            ny += dy;
+        }
+        
+        nx = x - dx;
+        ny = y - dy;
+        while (IsInBounds(nx, ny) && boardState[nx, ny] == player)
+        {
+            count++;
+            nx -= dx;
+            ny -= dy;
+        }
+
+        return count;
+    }
+
+    private bool IsInBounds(int x, int y)
+    {
+        return x >= 0 && y >= 0 && x < SIZE && y < SIZE;
     }
 
     public void PlaceMove(int x, int y, int player)
