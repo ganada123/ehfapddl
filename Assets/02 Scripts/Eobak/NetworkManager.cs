@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
+// 코인
+
 [Serializable]
 public class ConsumeCoinRequest
 {
@@ -77,6 +79,26 @@ public class AddRankingResponse
     public string message;
 }
 
+// 랭크
+
+[Serializable]
+public class GetRankResponse
+{
+    public int rank;
+    public int rankPoints;
+}
+
+[Serializable]
+public class UpdateRankRequest
+{
+    public int gameResult;
+}
+
+[Serializable]
+public class UpdateRankResponse
+{
+    public string message;
+}
 
 public class NetworkManager : Singleton<NetworkManager>
 {
@@ -91,18 +113,18 @@ public class NetworkManager : Singleton<NetworkManager>
 
         ConsumeCoinRequest requestData = new ConsumeCoinRequest { amount = amount };
         string jsonString = JsonUtility.ToJson(requestData);
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonString);
+        //byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonString); // UnityWebRequest.Post()를 사용해서 생략해도 됨
 
-        using (UnityWebRequest www = new UnityWebRequest(Constants.ServerURL + "/coin/consume", UnityWebRequest.kHttpVerbPOST))
+        using (UnityWebRequest www = UnityWebRequest.Post(Constants.ServerURL + "/coin/consume", jsonString, "application/json"))
         {
-            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            //www.uploadHandler = new UploadHandlerRaw(bodyRaw);
             www.downloadHandler = new DownloadHandlerBuffer();
-            www.SetRequestHeader("Content-Type", "application/json");
             www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));
 
             yield return www.SendWebRequest();
 
-            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            if (www.result == UnityWebRequest.Result.ConnectionError || 
+                www.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError($"코인 차감 오류: {www.error}");
                 failure?.Invoke(www.error);
@@ -150,7 +172,8 @@ public class NetworkManager : Singleton<NetworkManager>
 
             yield return www.SendWebRequest();
 
-            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            if (www.result == UnityWebRequest.Result.ConnectionError || 
+                www.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError($"광고 시청 보상 오류: {www.error}");
                 failure?.Invoke(www.error);
@@ -189,18 +212,16 @@ public class NetworkManager : Singleton<NetworkManager>
 
         PurchaseCoinRequest requestData = new PurchaseCoinRequest { purchaseAmount = purchaseAmount };
         string jsonString = JsonUtility.ToJson(requestData);
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonString);
 
-        using (UnityWebRequest www = new UnityWebRequest(Constants.ServerURL + "/coin/purchase", UnityWebRequest.kHttpVerbPOST))
+        using (UnityWebRequest www = UnityWebRequest.Post(Constants.ServerURL + "/coin/purchase", jsonString, "application/json"))
         {
-            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
             www.downloadHandler = new DownloadHandlerBuffer();
-            www.SetRequestHeader("Content-Type", "application/json");
             www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));
 
             yield return www.SendWebRequest();
 
-            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            if (www.result == UnityWebRequest.Result.ConnectionError || 
+                www.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError($"코인 구매 오류: {www.error}");
                 failure?.Invoke(www.error);
@@ -248,7 +269,8 @@ public class NetworkManager : Singleton<NetworkManager>
 
             yield return www.SendWebRequest();
 
-            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            if (www.result == UnityWebRequest.Result.ConnectionError || 
+                www.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError($"코인 잔액 조회 오류: {www.error}");
                 failure?.Invoke(www.error);
@@ -296,7 +318,8 @@ public class NetworkManager : Singleton<NetworkManager>
 
             yield return www.SendWebRequest();
 
-            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            if (www.result == UnityWebRequest.Result.ConnectionError ||
+                www.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError($"랭킹 정보 조회 오류: {www.error}");
                 failure?.Invoke(www.error);
@@ -325,7 +348,8 @@ public class NetworkManager : Singleton<NetworkManager>
         Instance.StartCoroutine(GetRankingCoroutine(success, failure));
     }
 
-    private IEnumerator AddRankingCoroutine(string nickname, int rank, int win, int lose, Action<AddRankingResponse> success, Action<string> failure)
+    private IEnumerator AddRankingCoroutine(string nickname, int rank, int win, int lose,
+        Action<AddRankingResponse> success, Action<string> failure)
     {
         if (string.IsNullOrEmpty(PlayerPrefs.GetString("sid")))
         {
@@ -335,18 +359,16 @@ public class NetworkManager : Singleton<NetworkManager>
 
         AddRankingRequest requestData = new AddRankingRequest { nickname = nickname, rank = rank, win = win, lose = lose };
         string jsonString = JsonUtility.ToJson(requestData);
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonString);
 
-        using (UnityWebRequest www = new UnityWebRequest(Constants.ServerURL + "/ranking/addranking", UnityWebRequest.kHttpVerbPOST))
+        using (UnityWebRequest www = UnityWebRequest.Post(Constants.ServerURL + "/ranking/addranking", jsonString, "application/json"))
         {
-            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
             www.downloadHandler = new DownloadHandlerBuffer();
-            www.SetRequestHeader("Content-Type", "application/json");
             www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));
 
             yield return www.SendWebRequest();
 
-            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            if (www.result == UnityWebRequest.Result.ConnectionError ||
+                www.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError($"랭킹 추가 오류: {www.error}");
                 failure?.Invoke(www.error);
@@ -381,6 +403,104 @@ public class NetworkManager : Singleton<NetworkManager>
 
     #endregion
 
+    #region 랭크
+
+    private IEnumerator UpdateRankCoroutine(int gameResult,
+        Action<UpdateRankResponse> sucess, Action<string> failure)
+    {
+        if (string.IsNullOrEmpty(PlayerPrefs.GetString("sid")))
+        {
+            failure?.Invoke("로그인이 필요합니다.");
+            yield break;
+        }
+
+        UpdateRankRequest requestData = new UpdateRankRequest { gameResult = gameResult };
+        string jsonString = JsonUtility.ToJson(requestData);
+
+        using (UnityWebRequest www = UnityWebRequest.Post(Constants.ServerURL + "/rank/updaterank", jsonString, "application/json"))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));
+
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError ||
+                www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError($"랭크 업데이트 오류: {www.error}");
+                failure?.Invoke(www.error);
+            }
+            else
+            {
+                if (www.responseCode == 200)
+                {
+                    UpdateRankResponse response = JsonUtility.FromJson<UpdateRankResponse>(www.downloadHandler.text);
+                    sucess?.Invoke(response); // "급수가 업데이트되었습니다."
+                }
+                else if (www.responseCode == 401)
+                {
+                    failure?.Invoke("로그인이 필요합니다.");
+                }
+                else
+                {
+                    failure?.Invoke($"서버 오류: {www.responseCode}");
+                }
+            }
+        }
+    }
+
+    public void UpdateRank(int gameResult, Action<UpdateRankResponse> sucess, Action<string> failure)
+    {
+        StartCoroutine(UpdateRankCoroutine(gameResult, sucess, failure));
+    }
+    
+    private IEnumerator GetRankCoroutine(Action<GetRankResponse> sucess, Action<string> failure)
+    {
+        if (string.IsNullOrEmpty(PlayerPrefs.GetString("sid")))
+        {
+            failure?.Invoke("로그인이 필요합니다.");
+            yield break;
+        }
+
+        using (UnityWebRequest www = UnityWebRequest.Get(Constants.ServerURL + "/rank/getrank"))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid"));
+
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError ||
+                www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError($"랭크 정보 조회 오류: {www.error}");
+                failure?.Invoke(www.error);
+            }
+            else
+            {
+                if (www.responseCode == 200)
+                {
+                    GetRankResponse response = JsonUtility.FromJson<GetRankResponse>(www.downloadHandler.text);
+                    sucess?.Invoke(response);
+                }
+                else if (www.responseCode == 401)
+                {
+                    failure?.Invoke("로그인이 필요합니다.");
+                }
+                else
+                {
+                    failure?.Invoke($"서버 오류: {www.responseCode}");
+                }
+            }
+        }
+    }
+
+    public void GetRank(Action<GetRankResponse> sucess, Action<string> failure)
+    {
+        Instance.StartCoroutine(GetRankCoroutine(sucess, failure));
+    }
+    
+    #endregion
+    
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         

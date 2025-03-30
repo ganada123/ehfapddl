@@ -4,10 +4,20 @@ namespace _02_Scripts.Eobak
 {
     public class GuideLine : MonoBehaviour
     {
-        void Start()
+        public void Test()
         {
+            // 광고 보상 적립 예시
+            NetworkManager.Instance.RewardAd(
+                (response) => { Debug.Log($"광고 보상 적립 성공: {response.message}"); },
+                (error) => {Debug.LogError($"광고 보상 적립 실패: {error}"); });
+            
+            // 코인 구매 예시
+            NetworkManager.Instance.PurchaseCoin("1000", // "1000": 3000코인, "2000": 6000코인, "2500", 10000코인 (구매액: 코인)
+                (response) => { Debug.Log($"코인 구매 성공: {response.message}"); },
+                (error) => { Debug.LogError($"코인 구매 실패: {error}"); }); 
+            
             // 코인 차감 예시
-            NetworkManager.Instance.ConsumeCoin(Constants.CoinConsumption,
+            NetworkManager.Instance.ConsumeCoin(Constants.CoinConsumption, // 100 코인 감소
                 (response) => { Debug.Log($"코인 차감 성공: {response.message}"); },
                 (error) => { Debug.LogError($"코인 차감 실패: {error}"); });
 
@@ -16,6 +26,11 @@ namespace _02_Scripts.Eobak
                 (coins) => { Debug.Log($"현재 코인 잔액: {coins}"); },
                 (error) => { Debug.LogError($"코인 잔액 조회 실패: {error}"); });
 
+            // // 랭킹 추가 예시
+            // NetworkManager.Instance.AddRanking("새로추가할유저이름01", 3, 5, 1,
+            //     (response) => { Debug.Log($"랭킹 추가 성공: {response.message}"); },
+            //     (error) => { Debug.LogError($"랭킹 추가 실패: {error}"); });
+            
             // 랭킹 정보 조회 예시
             NetworkManager.Instance.GetRanking(
                 (ranking) => {
@@ -24,7 +39,7 @@ namespace _02_Scripts.Eobak
                         Debug.Log("랭킹 정보:");
                         foreach (var user in ranking)
                         {
-                            Debug.Log($"- {user.rankingPosition}위: {user.nickname} (랭크: {user.rank}, 승: {user.win}, 패: {user.lose})");
+                            Debug.Log($"- {user.rankingPosition}위: {user.nickname} (급수: {user.rank}, 승: {user.win}, 패: {user.lose})");
                         }
                     }
                     else
@@ -33,11 +48,16 @@ namespace _02_Scripts.Eobak
                     }
                 },
                 (error) => { Debug.LogError($"랭킹 정보 조회 실패: {error}"); });
-
-            // 랭킹 추가 예시
-            NetworkManager.Instance.AddRanking("새로추가할유저이름01", 3, 5, 1,
-                (response) => { Debug.Log($"랭킹 추가 성공: {response.message}"); },
-                (error) => { Debug.LogError($"랭킹 추가 실패: {error}"); });
+            
+            // 랭크 업데이트 예시
+            NetworkManager.Instance.UpdateRank(Constants.Win,
+                (response) => { Debug.Log($"급수 업데이트 성공: {response.message}");},
+                (error) => { Debug.LogError($"급수 업데이트 실패: {error}");});
+            
+            // 랭크 정보 조회 예시
+            NetworkManager.Instance.GetRank(
+                (user) => { Debug.Log($"급수: {user.rank}, 랭크 포인트: {user.rankPoints}"); },
+                (error) => { Debug.LogError("급수 조회 실패");});
         }
     }
 }

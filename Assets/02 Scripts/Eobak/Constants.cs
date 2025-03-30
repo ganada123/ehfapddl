@@ -49,5 +49,9 @@ namespace _02_Scripts.Eobak
             { "1800", 6000 }, // 1800원, 6000코인
             { "2500", 10000 } // 2500원, 10000코인
         };
+
+        public const int Win = 0;
+        public const int Lose = 1;
+        public const int Draw = 2;
     }
 }
