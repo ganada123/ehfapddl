@@ -16,32 +16,32 @@ public class NicknameChange : Singleton<NicknameChange>
     [SerializeField] private TMP_InputField _nicknameInputField;
     [SerializeField] public TMP_Text _nicknameText;
 
-    public void OnClickNicknameConfirm() // ´Ğ³×ÀÓ º¯°æÇÏ´Â ¸Ş¼­µå
+    public void OnClickNicknameConfirm() // ë‹‰ë„¤ì„ ë³€ê²½í•˜ëŠ” ë©”ì„œë“œ
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
 
         var nickname = _nicknameInputField.text;
-        Debug.Log("´Ğ³×ÀÓ :" + nickname);
+        Debug.Log("ë‹‰ë„¤ì„ :" + nickname);
 
         if (string.IsNullOrEmpty(nickname))
         {
-            MainController.Instance.OpenConfirmPanel("´Ğ³×ÀÓÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä", () => { });
+            MainController.Instance.OpenConfirmPanel("ë‹‰ë„¤ì„ì„ ì…ë ¥í•´ì£¼ì„¸ìš”", () => { });
             return;
         }
 
-        // NicknameData Å¬·¡½º¸¦ ÀÌ¿ëÇÏ¿© °´Ã¼ »ı¼º
+        // NicknameData í´ë˜ìŠ¤ë¥¼ ì´ìš©í•˜ì—¬ ê°ì²´ ìƒì„±
         NicknameData nicknameData = new NicknameData { nickname = nickname };
-        Debug.Log("´Ğ³×ÀÓ :" + nicknameData.nickname);
+        Debug.Log("ë‹‰ë„¤ì„ :" + nicknameData.nickname);
 
         StartCoroutine(NetworkManage.Instance.SetNickname(nicknameData,
         success => {
-            MainController.Instance.OpenConfirmPanel("´Ğ³×ÀÓÀÌ ¼³Á¤µÇ¾ú½À´Ï´Ù.", () =>
+            MainController.Instance.OpenConfirmPanel("ë‹‰ë„¤ì„ì´ ì„¤ì •ë˜ì—ˆìŠµë‹ˆë‹¤.", () =>
             {
                 _nicknameText.text = nickname;
             });
         },
         error => {
-            MainController.Instance.OpenConfirmPanel("´Ğ³×ÀÓ ¼³Á¤ ½ÇÆĞ: " + error, null);
+            MainController.Instance.OpenConfirmPanel("ë‹‰ë„¤ì„ ì„¤ì • ì‹¤íŒ¨: " + error, null);
         }));
 
         nicknameChangePanel.SetActive(false);
@@ -49,7 +49,7 @@ public class NicknameChange : Singleton<NicknameChange>
 
     public void SetNickName(string nickname)
     {
-        _nicknameText.text = nickname; // ´Ğ³×ÀÓ º¯°æ ÈÄ UI ¾÷µ¥ÀÌÆ®
+        _nicknameText.text = nickname; // ë‹‰ë„¤ì„ ë³€ê²½ í›„ UI ì—…ë°ì´íŠ¸
     }
 
     public void OnClickNicknamePanel()

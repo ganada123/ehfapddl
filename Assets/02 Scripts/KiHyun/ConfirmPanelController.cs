@@ -19,7 +19,7 @@ public class ConfirmPanelController : PanelController
     }
 
     /// <summary>
-    /// Confirm ¹öÆ° Å¬¸¯½Ã È£ÃâµÇ´Â ÇÔ¼ö
+    /// Confirm ë²„íŠ¼ í´ë¦­ì‹œ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
     /// </summary>
     public void OnClickConfirmButton()
     {
@@ -27,7 +27,7 @@ public class ConfirmPanelController : PanelController
     }
 
     /// <summary>
-    /// X ¹öÆ° Å¬¸¯½Ã È£ÃâµÇ´Â ÇÔ¼ö
+    /// X ë²„íŠ¼ í´ë¦­ì‹œ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
     /// </summary>
     public void OnClickCloseButton()
     {

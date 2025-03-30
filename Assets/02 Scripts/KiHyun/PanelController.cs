@@ -7,9 +7,9 @@ using DG.Tweening;
 [RequireComponent(typeof(CanvasGroup))]
 public class PanelController : MonoBehaviour
 {
-    [SerializeField] private RectTransform panelRectTransform;      // ÆË¾÷Ã¢
+    [SerializeField] private RectTransform panelRectTransform;      // íŒì—…ì°½
 
-    private CanvasGroup _backgroundCanvasGroup;                     // µÚ¿¡ ½ÃÄ¿¸Õ ¹è°æ
+    private CanvasGroup _backgroundCanvasGroup;                     // ë’¤ì— ì‹œì»¤ë¨¼ ë°°ê²½
 
     public delegate void PanelControllerHideDelegate();
 
@@ -19,7 +19,7 @@ public class PanelController : MonoBehaviour
     }
 
     /// <summary>
-    /// Panel Ç¥½Ã ÇÔ¼ö
+    /// Panel í‘œì‹œ í•¨ìˆ˜
     /// </summary>
     public void Show()
     {
@@ -31,7 +31,7 @@ public class PanelController : MonoBehaviour
     }
 
     /// <summary>
-    /// Panel ¼û±â±â ÇÔ¼ö
+    /// Panel ìˆ¨ê¸°ê¸° í•¨ìˆ˜
     /// </summary>
     public void Hide(PanelControllerHideDelegate hideDelegate = null)
     {

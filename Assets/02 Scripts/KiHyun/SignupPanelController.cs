@@ -4,12 +4,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public struct SignupData // È¸¿ø°¡ÀÔ¿¡ ÇÊ¿äÇÑ µ¥ÀÌÅÍ ±¸Á¶Ã¼
+public struct SignupData // íšŒì›ê°€ì…ì— í•„ìš”í•œ ë°ì´í„° êµ¬ì¡°ì²´
 {
     public string email;
     public string nickname;
     public string password;
-    public int profileImageIndex; // ¼±ÅÃÇÑ ÀÌ¹ÌÁöÀÇ ÀÎµ¦½º ¹øÈ£    
+    public int profileImageIndex; // ì„ íƒí•œ ì´ë¯¸ì§€ì˜ ì¸ë±ìŠ¤ ë²ˆí˜¸    
 }
 
 public class SignupPanelController : MonoBehaviour
@@ -19,9 +19,9 @@ public class SignupPanelController : MonoBehaviour
     [SerializeField] private TMP_InputField _passwordInputField;
     [SerializeField] private TMP_InputField _confirmPasswordInputField;
 
-    private bool isVisible = false; // ºñ¹Ğ¹øÈ£ °¡½Ã¼º »óÅÂ (º¸ÀÓ/¾Èº¸ÀÓ)
+    private bool isVisible = false; // ë¹„ë°€ë²ˆí˜¸ ê°€ì‹œì„± ìƒíƒœ (ë³´ì„/ì•ˆë³´ì„)
 
-    public void OnClickConfirmButton() // È¸¿ø°¡ÀÔ È®ÀÎ ¹öÆ° Å¬¸¯ ½Ã È£ÃâµÇ´Â ¸Ş¼­µå
+    public void OnClickConfirmButton() // íšŒì›ê°€ì… í™•ì¸ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œë˜ëŠ” ë©”ì„œë“œ
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
 
@@ -30,9 +30,9 @@ public class SignupPanelController : MonoBehaviour
         var confirmPassword = _confirmPasswordInputField.text;
         var nickname = _nicknameInputField.text;
 
-        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword) || string.IsNullOrEmpty(nickname)) // ÀÔ·Â ÇÊµå ´©¶ô ½Ã
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword) || string.IsNullOrEmpty(nickname)) // ì…ë ¥ í•„ë“œ ëˆ„ë½ ì‹œ
         {
-            MainController.Instance.OpenConfirmPanel("ÀÔ·Â ³»¿ëÀÌ ´©¶ôµÇ¾ú½À´Ï´Ù.", () => { });
+            MainController.Instance.OpenConfirmPanel("ì…ë ¥ ë‚´ìš©ì´ ëˆ„ë½ë˜ì—ˆìŠµë‹ˆë‹¤.", () => { });
             return;
         }
 
@@ -43,11 +43,11 @@ public class SignupPanelController : MonoBehaviour
             signupData.password = password;
             signupData.nickname = nickname;
 
-            // PlayerPrefs¿¡¼­ ¼±ÅÃµÈ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ °¡Á®¿È
-            int selectedImageIndex = PlayerPrefs.GetInt("SelectedProfileImageIndex", 0); // ±âº»°ª 0
+            // PlayerPrefsì—ì„œ ì„ íƒëœ ì´ë¯¸ì§€ ì¸ë±ìŠ¤ë¥¼ ê°€ì ¸ì˜´
+            int selectedImageIndex = PlayerPrefs.GetInt("SelectedProfileImageIndex", 0); // ê¸°ë³¸ê°’ 0
             signupData.profileImageIndex = selectedImageIndex;
 
-            // ¼­¹ö·Î SignupData Àü´ŞÇÏ¸é¼­ È¸¿ø°¡ÀÔ ÁøÇà
+            // ì„œë²„ë¡œ SignupData ì „ë‹¬í•˜ë©´ì„œ íšŒì›ê°€ì… ì§„í–‰
             StartCoroutine(NetworkManage.Instance.Signup(signupData, () =>
             {
                 Destroy(gameObject);
@@ -58,26 +58,26 @@ public class SignupPanelController : MonoBehaviour
                 _confirmPasswordInputField.text = "";
                 _nicknameInputField.text = "";
             }));
-            Debug.Log("È¸¿ø°¡ÀÔ ¿Ï·á");
+            Debug.Log("íšŒì›ê°€ì… ì™„ë£Œ");
         }
         else
         {
-            MainController.Instance.OpenConfirmPanel("ºñ¹Ğ¹øÈ£°¡ ¼­·Î ´Ù¸¨´Ï´Ù.", () =>
+            MainController.Instance.OpenConfirmPanel("ë¹„ë°€ë²ˆí˜¸ê°€ ì„œë¡œ ë‹¤ë¦…ë‹ˆë‹¤.", () =>
             {
-                Debug.Log("ºñ¹Ğ¹øÈ£°¡ ¼­·Î ´Ù¸¨´Ï´Ù.");
+                Debug.Log("ë¹„ë°€ë²ˆí˜¸ê°€ ì„œë¡œ ë‹¤ë¦…ë‹ˆë‹¤.");
                 _passwordInputField.text = "";
                 _confirmPasswordInputField.text = "";
             });
         }
     }
 
-    public void OnClickCancelButton() // È¸¿ø°¡ÀÔ Ãë¼Ò ¹öÆ° Å¬¸¯ ½Ã È£ÃâµÇ´Â ¸Ş¼­µå
+    public void OnClickCancelButton() // íšŒì›ê°€ì… ì·¨ì†Œ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œë˜ëŠ” ë©”ì„œë“œ
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
         Destroy(gameObject);
     }
 
-    public void ToggleSignupPasswordVisible() // ºñ¹Ğ¹øÈ£ Ç¥½Ã/¼û±â±â Åä±Û ¸Ş¼­µå (Password <-> Standard)
+    public void ToggleSignupPasswordVisible() // ë¹„ë°€ë²ˆí˜¸ í‘œì‹œ/ìˆ¨ê¸°ê¸° í† ê¸€ ë©”ì„œë“œ (Password <-> Standard)
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
 
@@ -90,10 +90,10 @@ public class SignupPanelController : MonoBehaviour
             _passwordInputField.contentType = TMP_InputField.ContentType.Password;
         }
         isVisible = !isVisible;
-        _passwordInputField.ForceLabelUpdate(); // UI »õ·Î°íÄ§
+        _passwordInputField.ForceLabelUpdate(); // UI ìƒˆë¡œê³ ì¹¨
     }
 
-    public void ToggleSignupConfirmPasswordVisible() // ºñ¹Ğ¹øÈ£ È®ÀÎ Ç¥½Ã/¼û±â±â Åä±Û ¸Ş¼­µå (Password <-> Standard)
+    public void ToggleSignupConfirmPasswordVisible() // ë¹„ë°€ë²ˆí˜¸ í™•ì¸ í‘œì‹œ/ìˆ¨ê¸°ê¸° í† ê¸€ ë©”ì„œë“œ (Password <-> Standard)
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
 

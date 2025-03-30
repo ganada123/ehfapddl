@@ -8,12 +8,12 @@ using UnityEngine.UI;
 
 public class MainController : Singleton<MainController>
 {
-    [SerializeField] private GameObject selectImagePanel; // ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ¼±ÅÃ ÆĞ³Î
-    [SerializeField] private GameObject confirmPanel; // ¾Ë¸² ÆĞ³Î
-    [SerializeField] private GameObject signupPanel; // È¸¿ø°¡ÀÔ ÆĞ³Î
-    [SerializeField] private GameObject signinPanel; // ·Î±×ÀÎ ÆĞ³Î
-    [SerializeField] private Sprite[] profileImages; // ¸ğµç ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ¹è¿­
-    [SerializeField] private Image profileImageUI; // Àû¿ëÇÒ ÇÁ·ÎÇÊ ÀÌ¹ÌÁö
+    [SerializeField] private GameObject selectImagePanel; // í”„ë¡œí•„ ì´ë¯¸ì§€ ì„ íƒ íŒ¨ë„
+    [SerializeField] private GameObject confirmPanel; // ì•Œë¦¼ íŒ¨ë„
+    [SerializeField] private GameObject signupPanel; // íšŒì›ê°€ì… íŒ¨ë„
+    [SerializeField] private GameObject signinPanel; // ë¡œê·¸ì¸ íŒ¨ë„
+    [SerializeField] private Sprite[] profileImages; // ëª¨ë“  í”„ë¡œí•„ ì´ë¯¸ì§€ ë°°ì—´
+    [SerializeField] private Image profileImageUI; // ì ìš©í•  í”„ë¡œí•„ ì´ë¯¸ì§€
 
     private Canvas _canvas;
 
@@ -41,20 +41,20 @@ public class MainController : Singleton<MainController>
         _canvas = GameObject.FindObjectOfType<Canvas>();
     }
 
-    public void ApplyProfileImage(int index) // ÇÁ·ÎÇÊ ÀÌ¹ÌÁö¿¡ Àû¿ëÇÏ´Â ¸Ş¼­µå
+    public void ApplyProfileImage(int index) // í”„ë¡œí•„ ì´ë¯¸ì§€ì— ì ìš©í•˜ëŠ” ë©”ì„œë“œ
     {
-        Sprite profileSprite = GetProfileImage(index); // ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ÀÎµ¦½º·Î ÀÌ¹ÌÁö °¡Á®¿À±â
+        Sprite profileSprite = GetProfileImage(index); // í”„ë¡œí•„ ì´ë¯¸ì§€ ì¸ë±ìŠ¤ë¡œ ì´ë¯¸ì§€ ê°€ì ¸ì˜¤ê¸°
         if (profileSprite != null)
         {
-            profileImageUI.sprite = profileSprite; // °¡Á®¿Â ÀÌ¹ÌÁö Àû¿ë
+            profileImageUI.sprite = profileSprite; // ê°€ì ¸ì˜¨ ì´ë¯¸ì§€ ì ìš©
         }
         else
         {
-            Debug.LogError("Àß¸øµÈ ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ÀÎµ¦½ºÀÔ´Ï´Ù.");
+            Debug.LogError("ì˜ëª»ëœ í”„ë¡œí•„ ì´ë¯¸ì§€ ì¸ë±ìŠ¤ì…ë‹ˆë‹¤.");
         }
     }
 
-    private Sprite GetProfileImage(int index) // ÇÁ·ÎÇÊ ÀÌ¹ÌÁö¸¦ °¡Á®¿À´Â ¸Ş¼­µå
+    private Sprite GetProfileImage(int index) // í”„ë¡œí•„ ì´ë¯¸ì§€ë¥¼ ê°€ì ¸ì˜¤ëŠ” ë©”ì„œë“œ
     {
         if (profileImages != null && index >= 0 && index < profileImages.Length)
         {
@@ -63,7 +63,7 @@ public class MainController : Singleton<MainController>
         return null;
     }
  
-    public void OpenProfileImagePanel() // ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ¼±ÅÃ ÆĞ³ÎÀ» ¿©´Â ¸Ş¼­µå
+    public void OpenProfileImagePanel() // í”„ë¡œí•„ ì´ë¯¸ì§€ ì„ íƒ íŒ¨ë„ì„ ì—¬ëŠ” ë©”ì„œë“œ
     {
         if (_canvas != null)
         {
@@ -72,7 +72,7 @@ public class MainController : Singleton<MainController>
         }
     }
 
-    public void OpenSignupPanel() // È¸¿ø°¡ÀÔ ÆĞ³ÎÀ» ¿©´Â ¸Ş¼­µå
+    public void OpenSignupPanel() // íšŒì›ê°€ì… íŒ¨ë„ì„ ì—¬ëŠ” ë©”ì„œë“œ
     {
         if (_canvas != null)
         {
@@ -81,16 +81,16 @@ public class MainController : Singleton<MainController>
         }
     }    
  
-    public void OpenConfirmPanel(string message, ConfirmPanelController.OnConfirmButtonClick onConfirmButtonClick) // ¾Ë¸² ÆĞ³ÎÀ» ¿©´Â ¸Ş¼­µå
+    public void OpenConfirmPanel(string message, ConfirmPanelController.OnConfirmButtonClick onConfirmButtonClick) // ì•Œë¦¼ íŒ¨ë„ì„ ì—¬ëŠ” ë©”ì„œë“œ
     {
         if (_canvas != null)
         {
-            Debug.Log("openconfirmpanel È£ÃâµÊ");
+            Debug.Log("openconfirmpanel í˜¸ì¶œë¨");
             var confirmPanelObject = Instantiate(confirmPanel, _canvas.transform);
             confirmPanelObject.GetComponent<ConfirmPanelController>()
                 .Show(message, onConfirmButtonClick);
         }
-        else Debug.Log ("_canvas°¡ ¾øÀ½");
+        else Debug.Log ("_canvasê°€ ì—†ìŒ");
     }
     
     public void OnClickLogoutButton()
@@ -98,18 +98,18 @@ public class MainController : Singleton<MainController>
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
         StartCoroutine(NetworkManage.Instance.Signout(() =>
         {
-            // ·Î±×¾Æ¿ô ¼º°ø ÈÄ Ã³¸®
-            Debug.Log("·Î±×¾Æ¿ô ¼º°ø");
-            MainController.Instance.OpenConfirmPanel("·Î±×¾Æ¿ô µÇ¾ú½À´Ï´Ù.", () =>
+            // ë¡œê·¸ì•„ì›ƒ ì„±ê³µ í›„ ì²˜ë¦¬
+            Debug.Log("ë¡œê·¸ì•„ì›ƒ ì„±ê³µ");
+            MainController.Instance.OpenConfirmPanel("ë¡œê·¸ì•„ì›ƒ ë˜ì—ˆìŠµë‹ˆë‹¤.", () =>
             {
-                // ·Î±×¾Æ¿ô ÈÄ ·Î±×ÀÎ È­¸é È°¼ºÈ­
+                // ë¡œê·¸ì•„ì›ƒ í›„ ë¡œê·¸ì¸ í™”ë©´ í™œì„±í™”
                 signinPanel.SetActive(true);
             });
         }, (errorMessage) =>
         {
-            // ·Î±×¾Æ¿ô ½ÇÆĞ ½Ã Ã³¸®
-            Debug.LogError("·Î±×¾Æ¿ô ½ÇÆĞ: " + errorMessage);
-            MainController.Instance.OpenConfirmPanel("·Î±×¾Æ¿ô¿¡ ½ÇÆĞÇß½À´Ï´Ù. ´Ù½Ã ½ÃµµÇØÁÖ¼¼¿ä.", () => { });
+            // ë¡œê·¸ì•„ì›ƒ ì‹¤íŒ¨ ì‹œ ì²˜ë¦¬
+            Debug.LogError("ë¡œê·¸ì•„ì›ƒ ì‹¤íŒ¨: " + errorMessage);
+            MainController.Instance.OpenConfirmPanel("ë¡œê·¸ì•„ì›ƒì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤. ë‹¤ì‹œ ì‹œë„í•´ì£¼ì„¸ìš”.", () => { });
         }));
     }
     
