@@ -1,4 +1,4 @@
-/*using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
@@ -11,7 +11,7 @@ public class Point : MonoBehaviour, IPointerClickHandler
     private Image imageComponent;
     private bool isOccupied = false;
     
-    public int x, y; // 바둑판 좌표 저장
+    public int x, y; // 바둑판 좌표
 
     void Start()
     {
@@ -31,12 +31,10 @@ public class Point : MonoBehaviour, IPointerClickHandler
 
         isOccupied = true;
         imageComponent.sprite = (player == 1) ? blackStoneSprite : whiteStoneSprite;
-        
-        /*Debug.Log($"Point 위치: ({x}, {y})"); // 디버깅용 로그#1#
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        GameManager.Instance.SelectPoint(gameObject);
+        GameManager.Instance.SelectPoint(x, y);
     }
-}*/
+}
