@@ -22,7 +22,7 @@ public class Cell : ReplayManager
     private void OnButtonClicked()
     {
         SceneManager.LoadScene("GoListMain");
-        GameManager.Instance.indexGameManager = Index;
+        /*GameManager.Instance.indexGameManager = Index;*/
     }
 
     public void SetItem(Item item, int setIndex)

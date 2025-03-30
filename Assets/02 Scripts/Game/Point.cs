@@ -10,8 +10,8 @@ public class Point : MonoBehaviour, IPointerClickHandler
 
     private Image imageComponent;
     private bool isOccupied = false;
-    
-    public int x, y; // 바둑판 좌표
+
+    public int x, y; // 바둑판 좌표 저장
 
     void Start()
     {
@@ -30,11 +30,13 @@ public class Point : MonoBehaviour, IPointerClickHandler
         if (isOccupied) return;
 
         isOccupied = true;
-        imageComponent.sprite = (player == 1) ? blackStoneSprite : whiteStoneSprite;
+        imageComponent.sprite = (player == -1) ? blackStoneSprite : whiteStoneSprite; // 흑돌: -1, 백돌: 1로 변경
+
+        /*Debug.Log($"Point 위치: ({x}, {y})"); // 디버깅용 로그*/
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        GameManager.Instance.SelectPoint(x, y);
+        GameManager.Instance.SelectPoint(gameObject);
     }
 }
