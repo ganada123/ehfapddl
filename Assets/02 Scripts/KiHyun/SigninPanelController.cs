@@ -5,13 +5,13 @@ using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public struct SigninData // ·Î±×ÀÎ¿¡ ÇÊ¿äÇÑ µ¥ÀÌÅÍ ±¸Á¶Ã¼
+public struct SigninData // ë¡œê·¸ì¸ì— í•„ìš”í•œ ë°ì´í„° êµ¬ì¡°ì²´
 {
     public string email;
     public string password;
 }
 
-public struct SigninResult // ·Î±×ÀÎ °á°ú¸¦ ´ãÀ» ±¸Á¶Ã¼
+public struct SigninResult // ë¡œê·¸ì¸ ê²°ê³¼ë¥¼ ë‹´ì„ êµ¬ì¡°ì²´
 {
     public int result;
     public string message;
@@ -47,51 +47,51 @@ public class SigninPanelController : MonoBehaviour
     [SerializeField] private TMP_InputField _passwordInputField;
     private bool isVisible = false;
 
-    public void OnClickSigninButton() // ·Î±×ÀÎ ¹öÆ° Å¬¸¯ ½Ã È£ÃâµÇ´Â ¸Ş¼­µå
+    public void OnClickSigninButton() // ë¡œê·¸ì¸ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œë˜ëŠ” ë©”ì„œë“œ
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
-        Debug.Log("·Î±×ÀÎ¹öÆ° Å¬¸¯");
+        Debug.Log("ë¡œê·¸ì¸ë²„íŠ¼ í´ë¦­");
         string email = _emailInputField.text;
         string password = _passwordInputField.text;
 
-        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password)) // ÀÌ¸ŞÀÏ ¶Ç´Â ºñ¹Ğ¹øÈ£°¡ ºñ¾îÀÖÀ» ¶§
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password)) // ì´ë©”ì¼ ë˜ëŠ” ë¹„ë°€ë²ˆí˜¸ê°€ ë¹„ì–´ìˆì„ ë•Œ
         {
-            MainController.Instance.OpenConfirmPanel("ÀÔ·Â ³»¿ëÀÌ ´©¶ôµÇ¾ú½À´Ï´Ù.", () => {
+            MainController.Instance.OpenConfirmPanel("ì…ë ¥ ë‚´ìš©ì´ ëˆ„ë½ë˜ì—ˆìŠµë‹ˆë‹¤.", () => {
 
             });
             return;
         }
 
-        var signinData = new SigninData(); // ·Î±×ÀÎ µ¥ÀÌÅÍ »ı¼º
+        var signinData = new SigninData(); // ë¡œê·¸ì¸ ë°ì´í„° ìƒì„±
         signinData.email = email;
         signinData.password = password;
 
-        StartCoroutine(NetworkManage.Instance.Signin(signinData, () => // signinData °´Ã¼¸¦ ¼­¹ö·Î Àü¼ÛÇÏ¿© ·Î±×ÀÎ ¿äÃ»
+        StartCoroutine(NetworkManage.Instance.Signin(signinData, () => // signinData ê°ì²´ë¥¼ ì„œë²„ë¡œ ì „ì†¡í•˜ì—¬ ë¡œê·¸ì¸ ìš”ì²­
         {
-            // Destroy(gameObject); // ·Î±×ÀÎ ¼º°ø ÈÄ ÇöÀç °´Ã¼ »èÁ¦
+            // Destroy(gameObject); // ë¡œê·¸ì¸ ì„±ê³µ í›„ í˜„ì¬ ê°ì²´ ì‚­ì œ
             gameObject.SetActive(false);
             
         }, result =>
         {
-            if (result == 0) // ÀÌ¸ŞÀÏÀÌ ¾øÀ» ¶§
+            if (result == 0) // ì´ë©”ì¼ì´ ì—†ì„ ë•Œ
             {
                 _emailInputField.text = "";
                 _passwordInputField.text = "";
             }
-            else if (result == 1) // ºñ¹Ğ¹øÈ£°¡ ÀÏÄ¡ÇÏÁö ¾ÊÀ» ¶§
+            else if (result == 1) // ë¹„ë°€ë²ˆí˜¸ê°€ ì¼ì¹˜í•˜ì§€ ì•Šì„ ë•Œ
             {
                 _passwordInputField.text = "";
             }
         }));
     }
 
-    public void OnClickSignupButton() // È¸¿ø°¡ÀÔ ¹öÆ° Å¬¸¯ ½Ã È£ÃâµÇ´Â ¸Ş¼­µå
+    public void OnClickSignupButton() // íšŒì›ê°€ì… ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œë˜ëŠ” ë©”ì„œë“œ
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
         MainController.Instance.OpenSignupPanel();
     }
 
-    public void ToggleSigninPasswordVisible() // ºñ¹Ğ¹øÈ£ Ç¥½Ã/¼û±â±â Åä±Û ¸Ş¼­µå
+    public void ToggleSigninPasswordVisible() // ë¹„ë°€ë²ˆí˜¸ í‘œì‹œ/ìˆ¨ê¸°ê¸° í† ê¸€ ë©”ì„œë“œ
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
         if (!isVisible)

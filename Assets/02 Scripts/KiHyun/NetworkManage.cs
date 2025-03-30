@@ -6,12 +6,12 @@ using UnityEngine.Networking;
 
 public class ProfileImageUpdateRequest
 {
-    public int profileImageIndex; // ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ¹è¿­ÀÇ ¹øÈ£
+    public int profileImageIndex; // í”„ë¡œí•„ ì´ë¯¸ì§€ ë°°ì—´ì˜ ë²ˆí˜¸
 }
 
 public class NetworkManage : Singleton<NetworkManage>
 {
-    public IEnumerator Signup(SignupData signupData, Action success, Action failure) // È¸¿ø°¡ÀÔ ¿äÃ»À» ¼­¹ö·Î º¸³»´Â ¸Ş¼­µå
+    public IEnumerator Signup(SignupData signupData, Action success, Action failure) // íšŒì›ê°€ì… ìš”ì²­ì„ ì„œë²„ë¡œ ë³´ë‚´ëŠ” ë©”ì„œë“œ
     {
         string jsonString = JsonUtility.ToJson(signupData);
         Debug.Log("Sending Signup Data: " + jsonString);
@@ -34,9 +34,9 @@ public class NetworkManage : Singleton<NetworkManage>
 
                 if (www.responseCode == 409)
                 {
-                    // Áßº¹ »ç¿ëÀÚ´Â »ı¼º ºÒ°¡ ÆË¾÷ Ç¥½Ã
-                    Debug.Log("Áßº¹»ç¿ëÀÚ");
-                    MainController.Instance.OpenConfirmPanel("ÀÌ¹Ì Á¸ÀçÇÏ´Â »ç¿ëÀÚÀÔ´Ï´Ù.", () =>
+                    // ì¤‘ë³µ ì‚¬ìš©ìëŠ” ìƒì„± ë¶ˆê°€ íŒì—… í‘œì‹œ
+                    Debug.Log("ì¤‘ë³µì‚¬ìš©ì");
+                    MainController.Instance.OpenConfirmPanel("ì´ë¯¸ ì¡´ì¬í•˜ëŠ” ì‚¬ìš©ìì…ë‹ˆë‹¤.", () =>
                     {
                         failure?.Invoke();
                     });
@@ -48,8 +48,8 @@ public class NetworkManage : Singleton<NetworkManage>
                 var result = www.downloadHandler.text;
                 Debug.Log("Result: " + result);
 
-                // È¸¿ø°¡ÀÔ ¼º°ø ÆË¾÷ Ç¥½Ã
-                MainController.Instance.OpenConfirmPanel("È¸¿ø °¡ÀÔÀÌ ¿Ï·á µÇ¾ú½À´Ï´Ù.", () =>
+                // íšŒì›ê°€ì… ì„±ê³µ íŒì—… í‘œì‹œ
+                MainController.Instance.OpenConfirmPanel("íšŒì› ê°€ì…ì´ ì™„ë£Œ ë˜ì—ˆìŠµë‹ˆë‹¤.", () =>
                 {
                     success?.Invoke();
                 });
@@ -57,7 +57,7 @@ public class NetworkManage : Singleton<NetworkManage>
         }
     }
 
-    public IEnumerator Signin(SigninData signinData, Action success, Action<int> failure) // ·Î±×ÀÎ ¿äÃ»À» ¼­¹ö·Î º¸³»´Â ¸Ş¼­µå
+    public IEnumerator Signin(SigninData signinData, Action success, Action<int> failure) // ë¡œê·¸ì¸ ìš”ì²­ì„ ì„œë²„ë¡œ ë³´ë‚´ëŠ” ë©”ì„œë“œ
     {
         string jsonString = JsonUtility.ToJson(signinData);
 
@@ -81,33 +81,33 @@ public class NetworkManage : Singleton<NetworkManage>
                 }
 
                 var resultString = www.downloadHandler.text;
-                Debug.Log("Received JSON: " + resultString); // ¼­¹ö ÀÀ´ä È®ÀÎ ·Î±×
+                Debug.Log("Received JSON: " + resultString); // ì„œë²„ ì‘ë‹µ í™•ì¸ ë¡œê·¸
                 var result = JsonUtility.FromJson<SigninResult>(resultString);
-                Debug.Log($"·Î±×ÀÎ °á°ú°ª: {result.profileImageIndex} {result.nickname} {result.result}");
+                Debug.Log($"ë¡œê·¸ì¸ ê²°ê³¼ê°’: {result.profileImageIndex} {result.nickname} {result.result}");
 
-                if (result.result == 0) // emailÀÌ À¯È¿ÇÏÁö ¾ÊÀ½
+                if (result.result == 0) // emailì´ ìœ íš¨í•˜ì§€ ì•ŠìŒ
                 {
-                    Debug.Log("ÀÌ¸ŞÀÏÀÌ À¯È¿ÇÏÁö ¾ÊÀ½");
-                    MainController.Instance.OpenConfirmPanel("À¯Àú³×ÀÓÀÌ À¯È¿ÇÏÁö ¾Ê½À´Ï´Ù.", () =>
+                    Debug.Log("ì´ë©”ì¼ì´ ìœ íš¨í•˜ì§€ ì•ŠìŒ");
+                    MainController.Instance.OpenConfirmPanel("ìœ ì €ë„¤ì„ì´ ìœ íš¨í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.", () =>
                     {
                         failure?.Invoke(0);
                     });
                 }
-                else if (result.result == 1) // ÆĞ½º¿öµå°¡ À¯È¿ÇÏÁö ¾ÊÀ½
+                else if (result.result == 1) // íŒ¨ìŠ¤ì›Œë“œê°€ ìœ íš¨í•˜ì§€ ì•ŠìŒ
                 {
-                    Debug.Log("ºñ¹Ğ¹øÈ£°¡ À¯È¿ÇÏÁö ¾ÊÀ½");
-                    MainController.Instance.OpenConfirmPanel("ÆĞ½º¿öµå°¡ À¯È¿ÇÏÁö ¾Ê½À´Ï´Ù.", () =>
+                    Debug.Log("ë¹„ë°€ë²ˆí˜¸ê°€ ìœ íš¨í•˜ì§€ ì•ŠìŒ");
+                    MainController.Instance.OpenConfirmPanel("íŒ¨ìŠ¤ì›Œë“œê°€ ìœ íš¨í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.", () =>
                     {
                         failure?.Invoke(1);
                     });
                 }
-                else if (result.result == 2) // ·Î±×ÀÎ ¼º°ø
+                else if (result.result == 2) // ë¡œê·¸ì¸ ì„±ê³µ
                 {
                     MainController.Instance.ApplyProfileImage(result.profileImageIndex);
                     NicknameChange.Instance.SetNickName(result.nickname);
                     PlayerPrefs.SetInt("SelectedProfileImageIndex", result.profileImageIndex);
                     PlayerPrefs.Save();
-                    MainController.Instance.OpenConfirmPanel("·Î±×ÀÎ¿¡ ¼º°øÇÏ¿´½À´Ï´Ù.", () =>
+                    MainController.Instance.OpenConfirmPanel("ë¡œê·¸ì¸ì— ì„±ê³µí•˜ì˜€ìŠµë‹ˆë‹¤.", () =>
                     {
                         success?.Invoke();
                     });
@@ -126,26 +126,26 @@ public class NetworkManage : Singleton<NetworkManage>
             www.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonString));
             www.downloadHandler = new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
-            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid")); // ·Î±×ÀÎ ¼¼¼Ç À¯Áö
+            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid")); // ë¡œê·¸ì¸ ì„¸ì…˜ ìœ ì§€
 
             yield return www.SendWebRequest();
 
             if (www.result == UnityWebRequest.Result.Success)
             {
                 var result = www.downloadHandler.text;
-                Debug.Log("´Ğ³×ÀÓ ¼³Á¤ ¼º°ø: " + result);
+                Debug.Log("ë‹‰ë„¤ì„ ì„¤ì • ì„±ê³µ: " + result);
                 success?.Invoke(result);
             }
             else
             {
-                Debug.LogError("´Ğ³×ÀÓ ¼³Á¤ ½ÇÆĞ: " + www.error);
+                Debug.LogError("ë‹‰ë„¤ì„ ì„¤ì • ì‹¤íŒ¨: " + www.error);
                 failure?.Invoke(www.error);
             }
         }
     }
 
 
-    public IEnumerator UpdateProfileImage(int imageIndex) // ÇÁ·ÎÇÊ ÀÌ¹ÌÁö¸¦ ¾÷µ¥ÀÌÆ®ÇÏ´Â ¸Ş¼­µå
+    public IEnumerator UpdateProfileImage(int imageIndex) // í”„ë¡œí•„ ì´ë¯¸ì§€ë¥¼ ì—…ë°ì´íŠ¸í•˜ëŠ” ë©”ì„œë“œ
     {
         ProfileImageUpdateRequest request = new ProfileImageUpdateRequest();
         request.profileImageIndex = imageIndex;
@@ -157,22 +157,22 @@ public class NetworkManage : Singleton<NetworkManage>
             www.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonString));
             www.downloadHandler = new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
-            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid")); // ·Î±×ÀÎ ¼¼¼Ç À¯Áö
+            www.SetRequestHeader("Cookie", PlayerPrefs.GetString("sid")); // ë¡œê·¸ì¸ ì„¸ì…˜ ìœ ì§€
 
             yield return www.SendWebRequest();
 
             if (www.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ® ¼º°ø!");
+                Debug.Log("í”„ë¡œí•„ ì´ë¯¸ì§€ ì—…ë°ì´íŠ¸ ì„±ê³µ!");
             }
             else
             {
-                Debug.LogError("ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ® ½ÇÆĞ: " + www.error);
+                Debug.LogError("í”„ë¡œí•„ ì´ë¯¸ì§€ ì—…ë°ì´íŠ¸ ì‹¤íŒ¨: " + www.error);
             }
         }
     }
 
-    public IEnumerator Signout(Action success, Action<string> failure) // ·Î±×¾Æ¿ô ¿äÃ»À» ¼­¹ö·Î º¸³»´Â ¸Ş¼­µå
+    public IEnumerator Signout(Action success, Action<string> failure) // ë¡œê·¸ì•„ì›ƒ ìš”ì²­ì„ ì„œë²„ë¡œ ë³´ë‚´ëŠ” ë©”ì„œë“œ
     {
         using (UnityWebRequest www = new UnityWebRequest(Constants.ServerURL + "/users/signout", UnityWebRequest.kHttpVerbPOST))
         {
@@ -182,15 +182,15 @@ public class NetworkManage : Singleton<NetworkManage>
 
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
-                Debug.LogError("·Î±×¾Æ¿ô ¿À·ù: " + www.error);
-                failure?.Invoke("·Î±×¾Æ¿ô ½ÇÆĞ");
+                Debug.LogError("ë¡œê·¸ì•„ì›ƒ ì˜¤ë¥˜: " + www.error);
+                failure?.Invoke("ë¡œê·¸ì•„ì›ƒ ì‹¤íŒ¨");
             }
             else
             {
-                // ·Î±×¾Æ¿ô ¼º°ø, ¼¼¼Ç Á¤º¸ »èÁ¦
+                // ë¡œê·¸ì•„ì›ƒ ì„±ê³µ, ì„¸ì…˜ ì •ë³´ ì‚­ì œ
                 PlayerPrefs.DeleteKey("sid");
                 PlayerPrefs.Save();
-                Debug.Log("·Î±×¾Æ¿ô ¼º°ø");
+                Debug.Log("ë¡œê·¸ì•„ì›ƒ ì„±ê³µ");
                 success?.Invoke();
             }
         }

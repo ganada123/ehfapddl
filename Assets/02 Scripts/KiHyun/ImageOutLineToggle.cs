@@ -7,7 +7,7 @@ public class ImageOutLineToggle : MonoBehaviour
 {
     public static Outline prevOutline;
     private Outline thisOutline;
-    private bool isSelected = false; // ÀÌ¹ÌÁö ¼±ÅÃ ¿©ºÎ
+    private bool isSelected = false; // ì´ë¯¸ì§€ ì„ íƒ ì—¬ë¶€
 
     private void Start()
     {
@@ -17,7 +17,7 @@ public class ImageOutLineToggle : MonoBehaviour
 
     public void ToggleOutline()
     {
-        // ÀÌÀü OutlineÀ» ºñÈ°¼ºÈ­ÇÏ°í ¼±ÅÃ ÇØÁ¦
+        // ì´ì „ Outlineì„ ë¹„í™œì„±í™”í•˜ê³  ì„ íƒ í•´ì œ
         if (prevOutline != null && prevOutline != thisOutline)
         {
             prevOutline.enabled = false;
@@ -28,9 +28,9 @@ public class ImageOutLineToggle : MonoBehaviour
             }
         }
 
-        // ÇöÀç ¼±ÅÃÇÑ ÀÌ¹ÌÁöÀÇ Outline ¼³Á¤
-        thisOutline.enabled = !thisOutline.enabled; // ¼±ÅÃ »óÅÂ Åä±Û
-        isSelected = thisOutline.enabled; // ¼±ÅÃ ¿©ºÎ ¹İ¿µ
+        // í˜„ì¬ ì„ íƒí•œ ì´ë¯¸ì§€ì˜ Outline ì„¤ì •
+        thisOutline.enabled = !thisOutline.enabled; // ì„ íƒ ìƒíƒœ í† ê¸€
+        isSelected = thisOutline.enabled; // ì„ íƒ ì—¬ë¶€ ë°˜ì˜
 
         if (isSelected)
         {
@@ -42,7 +42,7 @@ public class ImageOutLineToggle : MonoBehaviour
         }
     }
 
-    // ¼±ÅÃÇÑ ÀÌ¹ÌÁöÀÇ sprite ¹İÈ¯
+    // ì„ íƒí•œ ì´ë¯¸ì§€ì˜ sprite ë°˜í™˜
     public Sprite GetSelectedImage()
     {
         Image currentImage = GetComponent<Image>();
@@ -55,10 +55,10 @@ public class ImageOutLineToggle : MonoBehaviour
             }
             else
             {
-                // Debug.LogWarning(gameObject.name + "ÀÇ Image ÄÄÆ÷³ÍÆ®¿¡ Sprite°¡ ÇÒ´çµÇÁö ¾ÊÀ½");
+                // Debug.LogWarning(gameObject.name + "ì˜ Image ì»´í¬ë„ŒíŠ¸ì— Spriteê°€ í• ë‹¹ë˜ì§€ ì•ŠìŒ");
             }
         }
-        // Debug.LogWarning(gameObject.name + " ¼±ÅÃµÇÁö ¾ÊÀ½");
+        // Debug.LogWarning(gameObject.name + " ì„ íƒë˜ì§€ ì•ŠìŒ");
         return null;
     }
 }

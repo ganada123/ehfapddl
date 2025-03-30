@@ -5,30 +5,30 @@ using UnityEngine.UI;
 
 public class SettingManager : MonoBehaviour
 {
-    [SerializeField] private Slider bgmSlider; // ¹è°æÀ½ º¼·ı Á¶Àı ½½¶óÀÌ´õ
-    [SerializeField] private Slider sfxSlider; // È¿°úÀ½ º¼·ı Á¶Àı ½½¶óÀÌ´õ
-    [SerializeField] private Button confirmButton; // ¼³Á¤ ÀúÀå ¹öÆ°
-    [SerializeField] private Button cancelButton; // ¼³Á¤ Ãë¼Ò ¹öÆ°
-    [SerializeField] private GameObject settingPanel; // ¼³Á¤ ÆĞ³Î
+    [SerializeField] private Slider bgmSlider; // ë°°ê²½ìŒ ë³¼ë¥¨ ì¡°ì ˆ ìŠ¬ë¼ì´ë”
+    [SerializeField] private Slider sfxSlider; // íš¨ê³¼ìŒ ë³¼ë¥¨ ì¡°ì ˆ ìŠ¬ë¼ì´ë”
+    [SerializeField] private Button confirmButton; // ì„¤ì • ì €ì¥ ë²„íŠ¼
+    [SerializeField] private Button cancelButton; // ì„¤ì • ì·¨ì†Œ ë²„íŠ¼
+    [SerializeField] private GameObject settingPanel; // ì„¤ì • íŒ¨ë„
 
-    float prevBgmVolumn; // º¯°æ Àü BGM º¼·ı ÀúÀå
-    float prevSfxVolumn; // º¯°æ Àü SFX º¼·ı ÀúÀå
+    float prevBgmVolumn; // ë³€ê²½ ì „ BGM ë³¼ë¥¨ ì €ì¥
+    float prevSfxVolumn; // ë³€ê²½ ì „ SFX ë³¼ë¥¨ ì €ì¥
 
     private void Start()
     {
-        // ±âÁ¸¿¡ ÀúÀåµÈ º¼·ı °ª °¡Á®¿À±â (±âº»°ª 0.5)
+        // ê¸°ì¡´ì— ì €ì¥ëœ ë³¼ë¥¨ ê°’ ê°€ì ¸ì˜¤ê¸° (ê¸°ë³¸ê°’ 0.5)
         prevBgmVolumn = PlayerPrefs.GetFloat("BGMVolumn", 0.5f);
         prevSfxVolumn = PlayerPrefs.GetFloat("SFXVolumn", 0.5f);
 
-        // ½½¶óÀÌ´õ ÃÊ±â°ª ¼³Á¤
+        // ìŠ¬ë¼ì´ë” ì´ˆê¸°ê°’ ì„¤ì •
         bgmSlider.value = prevBgmVolumn;
         sfxSlider.value = prevSfxVolumn;
 
-        // ½½¶óÀÌ´õ °ª º¯°æ ½Ã º¼·ı Áï½ÃÀû¿ë
+        // ìŠ¬ë¼ì´ë” ê°’ ë³€ê²½ ì‹œ ë³¼ë¥¨ ì¦‰ì‹œì ìš©
         bgmSlider.onValueChanged.AddListener(UpdateBgmVolumn);
         sfxSlider.onValueChanged.AddListener(UpdateSfxVolumn);
 
-        // ¹öÆ° Å¬¸¯½Ã ¼³Á¤ ÀúÀå,Ãë¼Ò
+        // ë²„íŠ¼ í´ë¦­ì‹œ ì„¤ì • ì €ì¥,ì·¨ì†Œ
         confirmButton.onClick.AddListener(SaveSettings);
         cancelButton.onClick.AddListener(CancelSetting);
     }
@@ -41,7 +41,7 @@ public class SettingManager : MonoBehaviour
             PlayerPrefs.SetFloat("SFXVolumn", sfxSlider.value);
             PlayerPrefs.Save();
           
-            Debug.Log($"BGM : {bgmSlider.value}, SFX : {sfxSlider.value} ÀúÀå ¿Ï·á");
+            Debug.Log($"BGM : {bgmSlider.value}, SFX : {sfxSlider.value} ì €ì¥ ì™„ë£Œ");
             settingPanel.SetActive(false);
         }
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
@@ -57,7 +57,7 @@ public class SettingManager : MonoBehaviour
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
 
-        // Ãë¼Ò ½Ã ±âÁ¸ÀÇ ÀúÀåµÈ º¼·ı °ªÀ¸·Î µÇµ¹¸®±â
+        // ì·¨ì†Œ ì‹œ ê¸°ì¡´ì˜ ì €ì¥ëœ ë³¼ë¥¨ ê°’ìœ¼ë¡œ ë˜ëŒë¦¬ê¸°
         bgmSlider.value = prevBgmVolumn;
         sfxSlider.value = prevSfxVolumn;
 

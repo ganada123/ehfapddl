@@ -12,18 +12,18 @@ public class SoundManager : MonoBehaviour
     [SerializeField] AudioSource audioBgm;
     [SerializeField] AudioSource audioSfx;
 
-    // ¹è°æÀ½¾Ç Á¾·ù
+    // ë°°ê²½ìŒì•… ì¢…ë¥˜
     public enum Bgm
     {
-        BGM_TITLE, // ¸ŞÀÎ È­¸é BGM
-        BGM_INGAME // ÀÎ°ÔÀÓ BGM
+        BGM_TITLE, // ë©”ì¸ í™”ë©´ BGM
+        BGM_INGAME // ì¸ê²Œì„ BGM
     }
 
-    // È¿°úÀ½ Á¾·ù
+    // íš¨ê³¼ìŒ ì¢…ë¥˜
     public enum Sfx
     {
-        SFX_BUTTON, // ¹öÆ° ´©¸£´Â È¿°úÀ½
-        // SFX_STONE -> µ¹ ³õ´Â È¿°úÀ½?
+        SFX_BUTTON, // ë²„íŠ¼ ëˆ„ë¥´ëŠ” íš¨ê³¼ìŒ
+        // SFX_STONE -> ëŒ ë†“ëŠ” íš¨ê³¼ìŒ?
     }
 
     private void Awake()
@@ -53,7 +53,7 @@ public class SoundManager : MonoBehaviour
 
     public void StopBGM() { audioBgm.Stop();}
 
-    public void PlaySFX(Sfx sfx) { audioSfx.PlayOneShot(sfxs[(int)sfx]); } // È¿°úÀ½Àº ÇÑ¹ø¸¸ Àç»ı
+    public void PlaySFX(Sfx sfx) { audioSfx.PlayOneShot(sfxs[(int)sfx]); } // íš¨ê³¼ìŒì€ í•œë²ˆë§Œ ì¬ìƒ
 
     public void SetBgmVolume(float volumn) { audioBgm.volume = volumn; }
 

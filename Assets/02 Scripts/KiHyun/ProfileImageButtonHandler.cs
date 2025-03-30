@@ -5,43 +5,43 @@ using UnityEngine.UI;
 
 public class ProfileImageButtonHandler : MonoBehaviour
 {
-    public Image targetImage, signupTargetImage; // ¼±ÅÃµÈ ÇÁ·ÎÇÊ ÀÌ¹ÌÁö¸¦ Ç¥½ÃÇÒ Image ÄÄÆ÷³ÍÆ®
-    public ImageOutLineToggle[] imageOutLineToggles;  // ¸ğµç ImageOutLineToggle ÂüÁ¶ÇÏ´Â ¹è¿­
-    [SerializeField] private GameObject selectImagePanel; // ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ¼±ÅÃ ÆĞ³Î
+    public Image targetImage, signupTargetImage; // ì„ íƒëœ í”„ë¡œí•„ ì´ë¯¸ì§€ë¥¼ í‘œì‹œí•  Image ì»´í¬ë„ŒíŠ¸
+    public ImageOutLineToggle[] imageOutLineToggles;  // ëª¨ë“  ImageOutLineToggle ì°¸ì¡°í•˜ëŠ” ë°°ì—´
+    [SerializeField] private GameObject selectImagePanel; // í”„ë¡œí•„ ì´ë¯¸ì§€ ì„ íƒ íŒ¨ë„
 
-    private int selectedImageIndex = 0; // ¼±ÅÃÇÑ ÀÌ¹ÌÁö ÀÎµ¦½º ¹øÈ£
+    private int selectedImageIndex = 0; // ì„ íƒí•œ ì´ë¯¸ì§€ ì¸ë±ìŠ¤ ë²ˆí˜¸
    
     private void Awake()
     {
-        targetImage = GameObject.Find("Profile Image Button").GetComponent<Image>(); // ÇÁ·ÎÇÊ ÀÌ¹ÌÁö (¹öÆ°) °´Ã¼ Ã£°í ÄÄÆ÷³ÍÆ® °¡Á®¿È
+        targetImage = GameObject.Find("Profile Image Button").GetComponent<Image>(); // í”„ë¡œí•„ ì´ë¯¸ì§€ (ë²„íŠ¼) ê°ì²´ ì°¾ê³  ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜´
         GameObject signupImageObj = GameObject.Find("Signup Profile Image Button");
 
-        if(signupImageObj != null) signupTargetImage = signupImageObj.GetComponent<Image>(); // È¸¿ø°¡ÀÔ ÀÌ¹ÌÁö ¹öÆ°ÀÌ ÀÖÀ¸¸é °¡Á®¿È
+        if(signupImageObj != null) signupTargetImage = signupImageObj.GetComponent<Image>(); // íšŒì›ê°€ì… ì´ë¯¸ì§€ ë²„íŠ¼ì´ ìˆìœ¼ë©´ ê°€ì ¸ì˜´
 
-        LoadProfileImage(); // ÀúÀåµÈ ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ·Îµå
+        LoadProfileImage(); // ì €ì¥ëœ í”„ë¡œí•„ ì´ë¯¸ì§€ ë¡œë“œ
     }
 
-    public void OnClickConfirmButton() // ÀÌ¹ÌÁö ¼±ÅÃ ÆĞ³Î¿¡¼­ È®ÀÎ ¹öÆ° Å¬¸¯ ½Ã È£ÃâµÇ´Â ¸Ş¼­µå
+    public void OnClickConfirmButton() // ì´ë¯¸ì§€ ì„ íƒ íŒ¨ë„ì—ì„œ í™•ì¸ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œë˜ëŠ” ë©”ì„œë“œ
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
 
-        for (int i = 0; i < imageOutLineToggles.Length; i++) // ÀÌ¹ÌÁö ¼±ÅÃ Åä±Û ¹è¿­À» µ¹¸é¼­ ¼±ÅÃµÈ ÀÌ¹ÌÁö Ã£±â
+        for (int i = 0; i < imageOutLineToggles.Length; i++) // ì´ë¯¸ì§€ ì„ íƒ í† ê¸€ ë°°ì—´ì„ ëŒë©´ì„œ ì„ íƒëœ ì´ë¯¸ì§€ ì°¾ê¸°
         {
             Sprite selectedImage = imageOutLineToggles[i].GetSelectedImage();
             if (selectedImage != null)
             {
-                targetImage.sprite = selectedImage; // ¼±ÅÃµÈ ÇÁ·ÎÇÊ ÀÌ¹ÌÁö Àû¿ë
+                targetImage.sprite = selectedImage; // ì„ íƒëœ í”„ë¡œí•„ ì´ë¯¸ì§€ ì ìš©
 
-                if (signupTargetImage != null) // È¸¿ø°¡ÀÔ Ã¢ÀÌ ÀÖ´Â °æ¿ì¿¡¸¸ Àû¿ë
+                if (signupTargetImage != null) // íšŒì›ê°€ì… ì°½ì´ ìˆëŠ” ê²½ìš°ì—ë§Œ ì ìš©
                     signupTargetImage.sprite = selectedImage;
 
-                // ¼±ÅÃÇÑ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ ÀúÀå
+                // ì„ íƒí•œ ì´ë¯¸ì§€ ì¸ë±ìŠ¤ë¥¼ ì €ì¥
                 PlayerPrefs.SetInt("SelectedProfileImageIndex", i);
                 PlayerPrefs.Save();
 
-                Debug.Log("¼±ÅÃÇÑ ÀÌ¹ÌÁö ÀÎµ¦½º: " + i);
+                Debug.Log("ì„ íƒí•œ ì´ë¯¸ì§€ ì¸ë±ìŠ¤: " + i);
 
-                StartCoroutine(NetworkManage.Instance.UpdateProfileImage(i)); // ¼­¹ö¿¡ ¼±ÅÃÇÑ ÀÌ¹ÌÁö ÀÎµ¦½º Àü¼Û
+                StartCoroutine(NetworkManage.Instance.UpdateProfileImage(i)); // ì„œë²„ì— ì„ íƒí•œ ì´ë¯¸ì§€ ì¸ë±ìŠ¤ ì „ì†¡
                 break;
             }
         }
@@ -52,7 +52,7 @@ public class ProfileImageButtonHandler : MonoBehaviour
         }
     }
         
-    private void LoadProfileImage() // ÀúÀåµÈ ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ·ÎµåÇÏ´Â ¸Ş¼­µå
+    private void LoadProfileImage() // ì €ì¥ëœ í”„ë¡œí•„ ì´ë¯¸ì§€ ë¡œë“œí•˜ëŠ” ë©”ì„œë“œ
     {
         int savedIndex = PlayerPrefs.GetInt("SelectedProfileImageIndex", 0);
         if (savedIndex < imageOutLineToggles.Length)
@@ -65,7 +65,7 @@ public class ProfileImageButtonHandler : MonoBehaviour
         }
     }
     
-    public void SetProfileImage(int index) // ÇÁ·ÎÇÊ ÀÌ¹ÌÁö¸¦ ¼³Á¤ÇÏ´Â ¸Ş¼­µå
+    public void SetProfileImage(int index) // í”„ë¡œí•„ ì´ë¯¸ì§€ë¥¼ ì„¤ì •í•˜ëŠ” ë©”ì„œë“œ
     {
         if (index >= 0 && index < imageOutLineToggles.Length)
         {
@@ -73,18 +73,18 @@ public class ProfileImageButtonHandler : MonoBehaviour
         }
     }
 
-    public int GetSelectedImageIndex() // ¼±ÅÃÇÑ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ ¹İÈ¯ÇÏ´Â ¸Ş¼­µå
+    public int GetSelectedImageIndex() // ì„ íƒí•œ ì´ë¯¸ì§€ ì¸ë±ìŠ¤ë¥¼ ë°˜í™˜í•˜ëŠ” ë©”ì„œë“œ
     {
         return selectedImageIndex;
     }
 
-    public void OnClickProfileButton() // ÇÁ·ÎÇÊ ÀÌ¹ÌÁö ¹öÆ° Å¬¸¯ ½Ã È£ÃâµÇ´Â ¸Ş¼­µå
+    public void OnClickProfileButton() // í”„ë¡œí•„ ì´ë¯¸ì§€ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œë˜ëŠ” ë©”ì„œë“œ
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
         MainController.Instance.OpenProfileImagePanel();
     }
 
-    public void OnClickCancelButton() // ÀÌ¹ÌÁö ¼±ÅÃ ÆĞ³Î¿¡¼­ Ãë¼Ò ¹öÆ° Å¬¸¯ ½Ã È£ÃâµÇ´Â ¸Ş¼­µå
+    public void OnClickCancelButton() // ì´ë¯¸ì§€ ì„ íƒ íŒ¨ë„ì—ì„œ ì·¨ì†Œ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œë˜ëŠ” ë©”ì„œë“œ
     {
         SoundManager.Instance.PlaySFX(SoundManager.Sfx.SFX_BUTTON);
         Destroy(selectImagePanel);

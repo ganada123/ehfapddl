@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// ÇÁ¸®ÆÕ¿¡¼­ ÀÌ¹ÌÁö ¼±ÅÃÃ¢À» °£´ÜÇÏ°Ô Instantiate ÇÏ±â À§ÇÑ ½ºÅ©¸³Æ®
+// í”„ë¦¬íŒ¹ì—ì„œ ì´ë¯¸ì§€ ì„ íƒì°½ì„ ê°„ë‹¨í•˜ê²Œ Instantiate í•˜ê¸° ìœ„í•œ ìŠ¤í¬ë¦½íŠ¸
 public class ButtonHandler : MonoBehaviour
 {
     public void OnClickProfileButton()
@@ -13,7 +13,7 @@ public class ButtonHandler : MonoBehaviour
         }
         else
         {
-            Debug.LogError("MainController ÀÎ½ºÅÏ½º¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+            Debug.LogError("MainController ì¸ìŠ¤í„´ìŠ¤ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
         }
     }
 }
