@@ -474,7 +474,7 @@ public class GameManager : MonoBehaviour
                         if (count >= 5)
                         {
                             Debug.Log($"🎉 CheckWinForAI: 플레이어 {player} 승리! ({(player == 1 ? "백돌" : "흑돌")}) at ({x}, {y})"); // ◀◀◀ 추가
-                            EndGame(player);
+                            EndGame(internalPlayer);
                             return true;
                         }
                     }

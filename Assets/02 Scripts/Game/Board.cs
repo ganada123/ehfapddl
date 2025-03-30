@@ -30,7 +30,7 @@ public class Board
     public bool CheckWin(int player)
     {
         // GameManager의 CheckWin 메서드 활용 (플레이어 표현 방식에 맞춰 조정)
-        return gameManager.CheckWinForAI(player == 1 ? 1 : 2);
+        return gameManager.CheckWinForAI(player == 1 ? 1 : -1);
     }
 
     public void PlaceMove(int x, int y, int player)
