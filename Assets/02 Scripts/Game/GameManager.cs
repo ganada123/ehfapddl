@@ -10,6 +10,9 @@ using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
+    // ✅ 코인 관련 필드
+    public int coin = 300;
+    [SerializeField] private TextMeshProUGUI coinText;
     /// <summary>
     /// TODO: indexGameManager 구현 | OnButtonClicked함수에서도 수정해야함
     /// path 도 구현
@@ -56,6 +59,28 @@ public class GameManager : MonoBehaviour
         new Vector2Int(1, 1),   // 대각선 ↘
         new Vector2Int(1, -1)  // 대각선 ↙
     };
+    public void AddCoin(int amount)
+    {
+        coin += amount;
+        UpdateCoinUI();
+    }
+
+    public bool SpendCoin(int amount)
+    {
+        if (coin >= amount)
+        {
+            coin -= amount;
+            UpdateCoinUI();
+            return true;
+        }
+        return false;
+    }
+
+    private void UpdateCoinUI()
+    {
+        if (coinText != null)
+            coinText.text = $"코인: {coin:N0}";
+    }
 
     void Awake()
     {
