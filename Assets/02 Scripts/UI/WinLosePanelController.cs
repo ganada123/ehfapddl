@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class WinLosePanelController : MonoBehaviour
@@ -143,4 +144,9 @@ public class WinLosePanelController : MonoBehaviour
         
     }
     #endregion
+
+    public void GetAcceptButton()
+    {
+        SceneManager.LoadScene("Main");
+    }
 }
