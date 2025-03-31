@@ -5,6 +5,7 @@ using _02_Scripts.Eobak;
 using UnityEngine;
 using Newtonsoft.Json;
 using SocketIOClient;
+using UnityEngine.SceneManagement;
 
 public class StonePlacedData
 {
@@ -101,7 +102,7 @@ public class DisconnectedData
     // 승자(winner)의 닉네임을 받아올 때 사용됩니다.
 }
 
-public class MultiplayManager : IDisposable
+public class MultiplayManager : Singleton<MultiplayManager>, IDisposable
 {
     private SocketIOUnity _socket;
     /// <summary>
@@ -172,19 +173,22 @@ public class MultiplayManager : IDisposable
     {
         var data = response.GetValue<RoomIdData>();
         OnRoomCreatedForMatch?.Invoke(data);
+        Debug.Log($"[MultiplayManager] Received event: roomCreatedForMatch, Room ID: {data.roomId}");
     }
-    
+
     // TODO: 돌 색 변수값 정해서 서버랑 조율, 흑돌(STONE_BLACK: "Black"), 백돌(STONE_WHITE: "White")
     private void SetColor(SocketIOResponse response) // 만든 의도: 자기색 설정하고 상대방의 색이랑 이름도 설정해라
     {
         var data = response.GetValue<SetColorData>();
         OnSetColor?.Invoke(data);
+        Debug.Log($"[MultiplayManager] Received event: setColor, Opponent Nickname: {data.opponentNickname}, My Color: {data.myColor}, Opponent Color: {data.opponentColor}, Room ID: {data.roomId}");
     }
-    
+
     // 색을 각 클라이언트에 화면에 표시 or 룰렛 연출 시작 신호
     private void ShowColor(SocketIOResponse response) // 만든 의도: 내 색과 상대 색이 정해지는 시점을 정의 하기 위해
     {
         OnShowColor?.Invoke();
+        Debug.Log("[MultiplayManager] Received event: showColor");
     }
 
     // 상대가 착수한 돌의 정보를 받아오는 이벤트
@@ -192,79 +196,106 @@ public class MultiplayManager : IDisposable
     {
         var data = response.GetValue<StonePlacedData>();
         OnStonePlaced?.Invoke(data);
+        Debug.Log($"[MultiplayManager] Received event: stonePlaced, Row: {data.row}, Col: {data.col}");
     }
 
     private void OpponentResigned(SocketIOResponse response)
     {
         var data = response.GetValue<OpoonentResignData>();
         OnOpponentResigned?.Invoke(data);
+        Debug.Log($"[MultiplayManager] Received event: opponentResigned, Winner Nickname: {data.winnerNickname}, Loser Nickname: {data.loserNickname}");
     }
 
     private void Resigned(SocketIOResponse response)
     {
         var data = response.GetValue<ResignData>();
         OnResigned?.Invoke(data);
+        Debug.Log($"[MultiplayManager] Received event: resigned, Opponent Nickname: {data.opponentNickname}");
     }
 
     private void OpponentRequestedDraw(SocketIOResponse response)
     {
         var data = response.GetValue<DrawRequestData>();
         OnOpponentRequestedDraw?.Invoke(data);
+        Debug.Log($"[MultiplayManager] Received event: opponentRequestedDraw, Requester Nickname: {data.requesterNickname}");
     }
 
     private void GameDraw(SocketIOResponse response)
     {
         OnGameDraw?.Invoke();
+        Debug.Log("[MultiplayManager] Received event: gameDraw");
     }
 
     private void DrawRejected(SocketIOResponse response)
     {
         var data = response.GetValue<DrawRejectData>();
         OnDrawRejected?.Invoke(data);
+        Debug.Log($"[MultiplayManager] Received event: drawRejected, Rejecter Nickname: {data.rejecterNickname}");
     }
 
     private void RematchRequested(SocketIOResponse response)
     {
         var data = response.GetValue<RematchRequestData>();
         OnRematchRequested?.Invoke(data);
+        Debug.Log($"[MultiplayManager] Received event: rematchRequested, Requester Nickname: {data.requesterNickname}, Room ID: {data.roomId}");
     }
 
     private void RematchRejected(SocketIOResponse response)
     {
         var data = response.GetValue<RematchRejectData>();
         OnRematchRejected?.Invoke(data);
+        Debug.Log($"[MultiplayManager] Received event: rematchRejected, Rejecter Nickname: {data.rejecterNickname}, Room ID: {data.roomId}");
     }
 
     private void OpponentDisconnectedGameplay(SocketIOResponse response)
     {
         var data = response.GetValue<DisconnectedData>();
         OnOpponentDisconnectedGameplay?.Invoke(data);
+        Debug.Log($"[MultiplayManager] Received event: opponentDisconnectedGameplay, Winner: {data.winner}");
     }
 
     private void OpponentDisconnectedBeforeStart(SocketIOResponse response)
     {
         OnOpponentDisconnectedBeforeStart?.Invoke();
+        Debug.Log("[MultiplayManager] Received event: opponentDisconnectedBeforeStart");
     }
-    
+
     private void ExitRoom(SocketIOResponse response)
     {
         OnExitRoom?.Invoke();
+        Debug.Log("[MultiplayManager] Received event: exitRoom");
     }
 
     private void GameEndedByResign(SocketIOResponse response)
     {
         OnGameEndedByResign?.Invoke();
+        Debug.Log("[MultiplayManager] Received event: gameEndedByResign");
     }
 
     private void RoomCreatedForRematch(SocketIOResponse response)
     {
         var data = response.GetValue<RoomIdData>();
         OnRoomCreatedForRematch?.Invoke(data);
+        Debug.Log($"[MultiplayManager] Received event: roomCreatedForRematch, Room ID: {data.roomId}");
     }
 
-    private void WaitingForMatch(SocketIOResponse response) { OnWaitingForMatch?.Invoke(); }
-    private void MatchWithAI(SocketIOResponse response) { OnMatchWithAI?.Invoke(); }
-    private void MatchmakingCancelled(SocketIOResponse response) { OnMatchmakingCancelled?.Invoke(); } // TODO:※ 매칭 취소 할 시 Dispose 해주기
+    private void WaitingForMatch(SocketIOResponse response)
+    {
+        OnWaitingForMatch?.Invoke();
+        Debug.Log("[MultiplayManager] Received event: waitingForMatch");
+    }
+
+    private void MatchWithAI(SocketIOResponse response)
+    {
+        OnMatchWithAI?.Invoke();
+        Debug.Log("[MultiplayManager] Received event: matchWithAI");
+    }
+
+    private void MatchmakingCancelled(SocketIOResponse response)
+    {
+        OnMatchmakingCancelled?.Invoke();
+        Debug.Log("[MultiplayManager] Received event: matchmakingCancelled");
+    }
 
     // 게임이 시작할 때 넣어주세요.
     // 서버에선 플레이어가 연결 끊길 때 게임 시작 여부를 판단하는 기능을 넣어뒀어요. <- 이점 유의해서 넣어주세요.
@@ -272,7 +303,7 @@ public class MultiplayManager : IDisposable
     {
         _socket.Emit("startGame");
     }
-    
+
     // TODO: 방을 나갈 때 Dispose 해주기
     public void LeaveRoom(string roomId)
     {
@@ -287,7 +318,7 @@ public class MultiplayManager : IDisposable
     {
         _socket.Emit("joinMatchQueue", new { email, rank, nickname });
     }
-    
+
     public void CancelMatchmaking()
     {
         _socket.Emit("cancelMatchmaking");
@@ -354,5 +385,10 @@ public class MultiplayManager : IDisposable
             _socket.Dispose();
             _socket = null;
         }
+    }
+
+    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        
     }
 }
