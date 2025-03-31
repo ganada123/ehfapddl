@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
     private GameObject lastPlacedMarker;
     public GameObject lastPlacedMarkerPrefab;
     [SerializeField] private GameObject winLosePrefab;
-    private int playerID =1;
+    private int playerID = 1;
     
     private Coroutine turnTimerCoroutine;
     private float turnTimeLimit = 30f; // ⏳ 한 턴 30초 제한
@@ -62,10 +62,7 @@ public class GameManager : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
-        if (playerID == 1)
-        {
-            playerID = 2;
-        }
+        
     }
 
     void Start()
@@ -502,6 +499,8 @@ public class GameManager : MonoBehaviour
         Debug.Log($"🎉 게임 종료! { (winner == 1 ? "흑돌" : "백돌") } 승리!");
         wonPlayer = winner;
 
+        Debug.Log(wonPlayer +"승리한 플레이어 1 흑돌 2 백돌");
+        Debug.Log(playerID + "플레이어ID 1 흑돌 2 백돌");
         if (wonPlayer == playerID)
         {
             amIwin = true;
