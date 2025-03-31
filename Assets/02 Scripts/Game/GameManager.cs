@@ -15,7 +15,6 @@ public class GameManager : MonoBehaviour
     /// path 도 구현
     /// </summary>
     public int indexGameManager = 0;
-    public string path = "";
     public int maxIndexGameManager = 0;
     /// <summary>
     /// TODO: 구현후 제거해주세요!! ⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳
