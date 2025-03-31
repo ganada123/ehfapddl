@@ -49,7 +49,7 @@ public class FakePurchaseManager : MonoBehaviour
     {
         Debug.Log($"결제 성공 → 코인 {rewardAmount} 지급");
 
-        GameManager.Instance.AddCoin(rewardAmount);
+        //GameManager.Instance.AddCoin(rewardAmount); <- 게임 매니저 추가시
         ShowCompletePanel();
         ClosePurchasePanel();
     }
