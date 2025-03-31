@@ -30,12 +30,17 @@ public class GameManager : MonoBehaviour
     private GameObject currentCursor;
     private GameObject selectedPoint;
     private int currentPlayer = 1; // 1: 흑돌, 2: 백돌
+    private bool isGameOver = false; // 게임이 끝났나 확인하는 변수 ->WinLosePanelController.cs
+    public bool amIwin = false; //승패 전달하기 위한 변수->WinLosePanelController.cs
+    public int wonPlayer = 0;
 
     private int[,] boardState = new int[15, 15];
     private GameObject[,] forbiddenMarkers = new GameObject[15, 15];
     
     private GameObject lastPlacedMarker;
-    public GameObject lastPlacedMarkerPrefab; 
+    public GameObject lastPlacedMarkerPrefab;
+    [SerializeField] private GameObject winLosePrefab;
+    private int playerID =1;
     
     private Coroutine turnTimerCoroutine;
     private float turnTimeLimit = 30f; // ⏳ 한 턴 30초 제한
@@ -57,6 +62,10 @@ public class GameManager : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
+        if (playerID == 1)
+        {
+            playerID = 2;
+        }
     }
 
     void Start()
@@ -486,15 +495,27 @@ public class GameManager : MonoBehaviour
         return count;
     }
     
-    private void EndGame(int winner)
+    public void EndGame(int winner)
     {
+        if(isGameOver) return;
+        isGameOver = true;
         Debug.Log($"🎉 게임 종료! { (winner == 1 ? "흑돌" : "백돌") } 승리!");
+        wonPlayer = winner;
 
+        if (wonPlayer == playerID)
+        {
+            amIwin = true;
+        }
+        else
+        {
+            amIwin = false;
+        }
         // UI 업데이트 (예: 승리 메시지 표시)
         if (turnText != null)
         {
             turnText.text = $"{(winner == 1 ? "흑돌" : "백돌")} 승리!";
         }
+        Instantiate(winLosePrefab);
 
         // 💀 모든 입력 비활성화
         placeStoneButton.interactable = false;

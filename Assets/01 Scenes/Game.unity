@@ -29561,6 +29561,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70ee8d2b352590b4bb042a3819c7438f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  indexGameManager: 0
+  path: 
+  maxIndexGameManager: 0
   omokPoints: []
   cursorPrefab: {fileID: 5771511950478714935, guid: 0e4fe20140e7902499387b0eaeac3cdf, type: 3}
   forbiddenPrefab: {fileID: 6194974831577839248, guid: d8442ee433c78b54fa8fd212fbde2cc6, type: 3}
@@ -29569,6 +29572,7 @@ MonoBehaviour:
   turnText: {fileID: 1559411062}
   timerText: {fileID: 993582016}
   lastPlacedMarkerPrefab: {fileID: 6754044173257123961, guid: 886999251e459514eb61ff07cf7784ab, type: 3}
+  winLosePrefab: {fileID: 2474119837254886132, guid: 0df7f8f08cbc9d04c8489c76f80c71c9, type: 3}
   audioSource: {fileID: 1400451360}
   placeStoneClip: {fileID: 8300000, guid: c21a10a81b923854ead27fa1661fe1eb, type: 3}
   tickTockClip: {fileID: 8300000, guid: e5fcd6a7f2d52a04d82fc490d7a49279, type: 3}
