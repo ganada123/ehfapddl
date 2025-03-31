@@ -121,7 +121,7 @@ public class ScrollViewController : MonoBehaviour
         foreach (var data in files)
         {
             _items.Add(new Item{imageFileName = "image1", title = data});
-            GameManager.Instance.maxIndexGameManager++;
+            /*GameManager.Instance.maxIndexGameManager++;*/
         }
         ReloadData();
     }
