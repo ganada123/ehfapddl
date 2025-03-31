@@ -173,7 +173,7 @@ public class ReplayManager : MonoBehaviour
 
     public void PlusGoList()
     {
-        if (index != GameManager.Instance.maxIndexGameManager-1)
+        /*if (index != GameManager.Instance.maxIndexGameManager-1)
         {
             int count = Makers.Count;
             for (int i = 0; i < count; i++)
@@ -182,7 +182,7 @@ public class ReplayManager : MonoBehaviour
             }
             index += 1;
             Test(index);
-        }
+        }*/
     }
 
     public void MinusGoList()

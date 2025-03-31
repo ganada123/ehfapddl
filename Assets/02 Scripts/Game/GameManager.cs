@@ -1,5 +1,9 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
@@ -26,31 +30,34 @@ public class GameManager : MonoBehaviour
     public Button placeStoneButton;
     public TextMeshProUGUI turnText;
     public TextMeshProUGUI timerText; // ⏳ 추가: 타이머 UI
+    public int aiDifficultyLevel = 1; // AI 난이도 (Inspector에서 설정 가능)
 
     private GameObject currentCursor;
     private GameObject selectedPoint;
-    private int currentPlayer = 1; // 1: 흑돌, 2: 백돌
+    private int currentPlayer = -1; // -1: 흑돌 (사용자), 1: 백돌 (AI)
 
-    private int[,] boardState = new int[15, 15];
+    private int[,] boardStateInternal = new int[15, 15]; // 내부 보드 상태
+    private Board board; // Board 클래스 인스턴스
+    private AIController aiController;
     private GameObject[,] forbiddenMarkers = new GameObject[15, 15];
-    
+
     private GameObject lastPlacedMarker;
-    public GameObject lastPlacedMarkerPrefab; 
-    
+    public GameObject lastPlacedMarkerPrefab;
+
     private Coroutine turnTimerCoroutine;
     private float turnTimeLimit = 30f; // ⏳ 한 턴 30초 제한
-    
+
     public AudioSource audioSource; // 소리를 재생할 AudioSource
     public AudioClip placeStoneClip; // 돌을 놓을 때 사운드
     public AudioClip tickTockClip; // 5초 이하일 때 틱톡 사운드
-    
+
     private readonly Vector2Int[] directions = {
-        new Vector2Int(1, 0),  // 가로 (→)
-        new Vector2Int(0, 1),  // 세로 (↓)
-        new Vector2Int(1, 1),  // 대각선 ↘
+        new Vector2Int(1, 0),   // 가로 (→)
+        new Vector2Int(0, 1),   // 세로 (↓)
+        new Vector2Int(1, 1),   // 대각선 ↘
         new Vector2Int(1, -1)  // 대각선 ↙
     };
-    
+
     void Awake()
     {
         if (Instance == null)
@@ -61,6 +68,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        board = new Board(boardStateInternal, this);
+        aiController = new AIController(aiDifficultyLevel);
+
         omokPoints = new GameObject[225];
 
         for (int i = 0; i < 15; i++)
@@ -85,6 +95,12 @@ public class GameManager : MonoBehaviour
         placeStoneButton.onClick.AddListener(PlaceStone);
         UpdateTurnUI();
         StartTurnTimer();
+
+        // AI가 먼저 시작하는 경우 (선택 사항)
+        // if (currentPlayer == 1)
+        // {
+        //     PlayAI();
+        // }
     }
 
     public void SelectPoint(GameObject point)
@@ -97,6 +113,7 @@ public class GameManager : MonoBehaviour
     }
 
     private int lastPlacedX, lastPlacedY;
+    public string path;
 
     public void PlaceStone()
     {
@@ -105,8 +122,9 @@ public class GameManager : MonoBehaviour
         Point pointScript = selectedPoint.GetComponent<Point>();
         int x = pointScript.x;
         int y = pointScript.y;
+        int previousPlayer = currentPlayer; // 현재 플레이어를 저장
 
-        if (currentPlayer == 1 && IsForbidden(x, y))
+        if (currentPlayer == -1 && IsForbiddenForAI(x, y)) // 사용자(흑돌) 금수 체크
         {
             return;
         }
@@ -114,7 +132,8 @@ public class GameManager : MonoBehaviour
         if (pointScript != null && !pointScript.IsOccupied())
         {
             pointScript.PlaceStone(currentPlayer);
-            boardState[x, y] = currentPlayer;
+            board.PlaceMove(x, y, currentPlayer);
+            boardStateInternal[x, y] = currentPlayer; // 내부 상태 업데이트 (필요한 경우)
 
             lastPlacedX = x;
             lastPlacedY = y;
@@ -124,16 +143,22 @@ public class GameManager : MonoBehaviour
                 Destroy(lastPlacedMarker);
             }
             lastPlacedMarker = Instantiate(lastPlacedMarkerPrefab, selectedPoint.transform.position, Quaternion.identity, cursorParent);
-            
+
             // ✅ **돌을 놓을 때 소리 재생**
             PlaySound(placeStoneClip);
-            
+
             // ✅ **오목 승리 체크**
-            if (CheckWin(x, y))
+            if (CheckWin(currentPlayer))
             {
                 return; // 승리 시 턴을 넘기지 않고 종료
             }
-            SwitchTurn();
+
+            // 사용자가 돌을 놓았을 때만 턴을 넘김
+            if (previousPlayer == -1)
+            {
+                SwitchTurn();
+            }
+            // AI가 돌을 놓았을 때는 이미 턴이 사용자에게 넘어간 상태여야 함 (PlayAITurn 코루틴 종료 시점)
         }
 
         Destroy(currentCursor);
@@ -145,15 +170,19 @@ public class GameManager : MonoBehaviour
 
     private void SwitchTurn()
     {
-        currentPlayer = (currentPlayer == 1) ? 2 : 1;
+        currentPlayer = (currentPlayer == -1) ? 1 : -1;
         UpdateTurnUI();
         RestartTurnTimer(); // ⏳ 턴이 바뀌면 타이머 다시 시작
+        if (currentPlayer == 1)
+        {
+            StartCoroutine(PlayAITurn());
+        }
     }
     private void UpdateTurnUI()
     {
         if (turnText != null)
         {
-            turnText.text = (currentPlayer == 1) ? "흑돌 차례입니다." : "백돌 차례입니다.";
+            turnText.text = (currentPlayer == -1) ? "흑돌 차례입니다." : "백돌 차례입니다.";
         }
     }
     private void StartTurnTimer()
@@ -196,6 +225,11 @@ public class GameManager : MonoBehaviour
         // ⏳ 시간이 다 되면 자동으로 턴을 넘김
         Debug.Log("⏳ 시간이 초과되었습니다. 자동으로 턴을 넘깁니다.");
         SwitchTurn();
+        // AI 턴으로 넘어갔으므로 AI 플레이
+        if (currentPlayer == 1)
+        {
+            StartCoroutine(PlayAITurn());
+        }
     }
     private void PlaySound(AudioClip clip)
     {
@@ -204,7 +238,7 @@ public class GameManager : MonoBehaviour
             audioSource.PlayOneShot(clip);
         }
     }
-    
+
     public void CheckForbiddenPoints()
     {
         // 기존 금수 마커 제거
@@ -221,14 +255,14 @@ public class GameManager : MonoBehaviour
         }
 
         // 백돌 차례면 검사 안 함
-        if (currentPlayer != 1) return;
+        if (currentPlayer != -1) return;
 
         // ✅ 바둑판 전체를 검사하여 금수 위치 마커 표시
         for (int x = 0; x < 15; x++)
         {
             for (int y = 0; y < 15; y++)
             {
-                if (boardState[x, y] == 0 && IsForbidden(x, y))
+                if (boardStateInternal[x, y] == 0 && IsForbiddenForAI(x, y))
                 {
                     GameObject marker = Instantiate(forbiddenPrefab, omokPoints[x * 15 + y].transform.position, Quaternion.identity, cursorParent);
                     forbiddenMarkers[x, y] = marker;
@@ -237,7 +271,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private bool IsForbidden(int x, int y)
+    // AIController에서 호출할 금수 판정 메서드 (흑돌 기준)
+    public bool IsForbiddenForAI(int x, int y)
     {
         bool isDoubleThree = CheckDoubleThree(x, y);
         bool isDoubleFour = CheckDoubleFour(x, y);
@@ -245,74 +280,63 @@ public class GameManager : MonoBehaviour
 
         if (isDoubleThree && isDoubleFour)
         {
-            /*Debug.Log($"[{x}, {y}] 삼삼 + 사사 발생 → 금수 아님");*/
             return false;
         }
 
-        /*if (isDoubleThree) Debug.Log($"[{x}, {y}] 삼삼 금수 감지!");
-        if (isDoubleFour) Debug.Log($"[{x}, {y}] 사사 금수 감지!");
-        if (isOverline) Debug.Log($"[{x}, {y}] 장목 금수 감지!");*/
-
         return isDoubleThree || isDoubleFour || isOverline;
+    }
+
+    private bool IsForbidden(int x, int y) // 기존 PlaceStone에서 사용하던 메서드 (더 이상 사용 안 함)
+    {
+        return IsForbiddenForAI(x, y);
     }
 
     private bool CheckDoubleThree(int x, int y)
     {
         int openThreeCount = 0;
-        Vector2Int[] directions = { 
-            Vector2Int.right, Vector2Int.up, 
-            new Vector2Int(1, 1), new Vector2Int(1, -1) 
+        Vector2Int[] directions = {
+            Vector2Int.right, Vector2Int.up,
+            new Vector2Int(1, 1), new Vector2Int(1, -1)
         };
 
         // **가상의 착수**
-        boardState[x, y] = 1; 
-
-        /*Debug.Log($"[{x}, {y}]에 가상의 흑돌 착수 후 검사 시작");*/
+        boardStateInternal[x, y] = -1;
 
         foreach (Vector2Int dir in directions)
         {
             if (CountOpenThree(x, y, dir))
             {
                 openThreeCount++;
-                /*Debug.Log($"[삼삼 감지] ({x}, {y}) 방향 {dir} → 열린 삼(33) 발견!");*/
             }
         }
 
         // **원상복구**
-        boardState[x, y] = 0; 
-
-        /*Debug.Log($"[{x}, {y}] 검사 후 원상복구 완료, openThreeCount = {openThreeCount}");*/
+        boardStateInternal[x, y] = 0;
 
         bool isDoubleThree = openThreeCount >= 2;
-        if (isDoubleThree)
-        {
-            /*Debug.Log($"[{x}, {y}] 금수 (삼삼) 판정됨!");*/
-        }
-
         return isDoubleThree;
     }
-    
+
     private bool CountOpenThree(int x, int y, Vector2Int dir)
     {
         string line = GetExtendedLine(x, y, dir, 5); // 더 긴 범위 체크
         return IsOpenThree(line);
     }
 
-    private bool IsOpenThree(string line) 
+    private bool IsOpenThree(string line)
     {
-        // 열린 삼(3,3) 패턴만 인식 (삼사, 사사는 제외)
-        return (line.Contains("0011100") || // 일반적인 3,3
-                line.Contains("011010") || line.Contains("010110") || 
-                line.Contains("0100110") || line.Contains("0011010") || 
-                line.Contains("001110") || line.Contains("01110") || 
-                line.Contains("0110100") || line.Contains("001101") || 
-                line.Contains("010011"))
-               && !line.Contains("011110") // 열린 사(4)를 포함하면 3,3이 아님 (삼사 방지)
-               && !line.Contains("11110") // 단순 4도 금수 아님
-               && !line.Contains("01111") // 단순 4도 금수 아님
-               && !line.Contains("1011101"); // 특수 케이스
+        return (line.Contains("00-1-1-100") || // 일반적인 3,3 (흑돌: -1)
+                line.Contains("0-1-10-10") || line.Contains("0-10-1-10") ||
+                line.Contains("0-100-1-10") || line.Contains("00-1-10-10") ||
+                line.Contains("00-1-1-10") || line.Contains("0-1-1-10") ||
+                line.Contains("0-1-10-100") || line.Contains("00-1-10-1") ||
+                line.Contains("0-100-1-1"))
+               && !line.Contains("0-1-1-1-10") // 열린 사(4)를 포함하면 3,3이 아님 (삼사 방지)
+               && !line.Contains("-1-1-1-10") // 단순 4도 금수 아님
+               && !line.Contains("0-1-1-1-1") // 단순 4도 금수 아님
+               && !line.Contains("-10-1-1-10-1"); // 특수 케이스
     }
-    
+
     // 특정 방향의 돌 상태를 문자열로 변환 (5칸 길이 체크)
     private string GetExtendedLine(int x, int y, Vector2Int dir, int length)
     {
@@ -323,28 +347,26 @@ public class GameManager : MonoBehaviour
         {
             int nx = x - dir.x * i, ny = y - dir.y * i;
             if (nx < 0 || ny < 0 || nx >= 15 || ny >= 15) break;
-            result += boardState[nx, ny].ToString();
+            result += boardStateInternal[nx, ny].ToString();
         }
 
         // **가상의 착수**
-        result += "1";
+        result += "-1";
 
         // **정방향 추가**
         for (int i = 1; i <= length; i++)
         {
             int nx = x + dir.x * i, ny = y + dir.y * i;
             if (nx < 0 || ny < 0 || nx >= 15 || ny >= 15) break;
-            result += boardState[nx, ny].ToString();
+            result += boardStateInternal[nx, ny].ToString();
         }
 
         // **열린 형태 확인을 위해 양끝에 0 추가**
         result = "0" + result + "0";
 
-        /*Debug.Log($"[{x}, {y}] 방향 {dir} → 검사된 문자열: {result}");*/
-
         return result;
     }
-    
+
     private bool CheckDoubleFour(int x, int y)
     {
         int openFourCount = 0;
@@ -356,7 +378,7 @@ public class GameManager : MonoBehaviour
 
         return openFourCount >= 2; // 열린 사(44) 개수가 2개 이상이면 금수!
     }
-    
+
     private int CountOpenFour(int x, int y, Vector2Int direction)
     {
         string line = GetExtendedLine(x, y, direction, 6); // 6칸 범위 검사
@@ -368,11 +390,10 @@ public class GameManager : MonoBehaviour
     }
     private bool IsOpenFour(string line)
     {
-        // 열린 사(4,4)만 체크 (삼사는 포함 X)
-        return line.Contains("011110") || line.Contains("211110") || 
-               line.Contains("011112") || line.Contains("0101110") || 
-               line.Contains("0111010") || line.Contains("0110110")
-               && !line.Contains("001110"); // 3,3 방지
+        return line.Contains("0-1-1-1-10") || line.Contains("1-1-1-1-10") ||
+               line.Contains("0-1-1-1-11") || line.Contains("0-10-1-1-10") ||
+               line.Contains("0-1-1-10-10") || line.Contains("0-1-10-1-10")
+               && !line.Contains("00-1-1-10"); // 3,3 방지
     }
     private int CountPattern(int x, int y, string pattern)
     {
@@ -386,21 +407,21 @@ public class GameManager : MonoBehaviour
     }
     private string GetLine(int x, int y, Vector2Int dir)
     {
-        string result = "0";  // 빈칸에서 시작
+        string result = "0";   // 빈칸에서 시작
         for (int i = -4; i <= 4; i++)
         {
             int nx = x + dir.x * i, ny = y + dir.y * i;
             if (nx < 0 || ny < 0 || nx >= 15 || ny >= 15) break;
-            result += boardState[nx, ny].ToString();
+            result += boardStateInternal[nx, ny].ToString();
         }
         return result;
     }
-    
+
     private bool CheckOverline(int x, int y)
     {
         return GetMaxLength(x, y) >= 6;
     }
-    
+
     private int GetMaxLength(int x, int y)
     {
         int maxLength = 1;
@@ -411,21 +432,21 @@ public class GameManager : MonoBehaviour
             {
                 int nx = x + dir.x * i, ny = y + dir.y * i;
                 if (nx < 0 || ny < 0 || nx >= 15 || ny >= 15) break;
-                if (boardState[nx, ny] == 1) length++;
+                if (boardStateInternal[nx, ny] == -1) length++;
                 else break;
             }
             for (int i = -1; i >= -5; i--)
             {
                 int nx = x + dir.x * i, ny = y + dir.y * i;
                 if (nx < 0 || ny < 0 || nx >= 15 || ny >= 15) break;
-                if (boardState[nx, ny] == 1) length++;
+                if (boardStateInternal[nx, ny] == -1) length++;
                 else break;
             }
             maxLength = Mathf.Max(maxLength, length);
         }
         return maxLength;
     }
-    
+
     private void PrintBoardState()
     {
         string boardString = "\n현재 오목판 상태:\n";
@@ -435,8 +456,8 @@ public class GameManager : MonoBehaviour
             for (int x = 0; x < 15; x++) // 왼쪽에서 오른쪽으로
             {
                 if (forbiddenMarkers[x, y] != null) boardString += "X "; // 금수 위치
-                else if (boardState[x, y] == 1) boardString += "● "; // 흑돌
-                else if (boardState[x, y] == 2) boardString += "○ "; // 백돌
+                else if (boardStateInternal[x, y] == -1) boardString += "● "; // 흑돌
+                else if (boardStateInternal[x, y] == 1) boardString += "○ "; // 백돌
                 else boardString += ". "; // 빈칸
             }
             boardString += "\n";
@@ -444,56 +465,60 @@ public class GameManager : MonoBehaviour
 
         Debug.Log(boardString);
     }
-    private bool CheckWin(int x, int y)
+
+    // AIController에서 호출할 승리 판정 메서드 (AI 플레이어: 1)
+    public bool CheckWin(int player)
     {
-        int player = boardState[x, y]; // 현재 플레이어 (흑돌 or 백돌)
-
-        foreach (Vector2Int dir in directions)
+        Debug.Log($"CheckWin Called for player: {player} ({(player == 1 ? "백돌" : "흑돌")})"); // ◀◀◀ 추가
+        int internalPlayer = (player == 1) ? 1 : -1; // AIController의 플레이어 표현에 맞춤
+        for (int x = 0; x < 15; x++)
         {
-            int count = 1;
-
-            // 🔼 정방향 탐색
-            count += CountStones(x, y, dir, player);
-            // 🔽 역방향 탐색
-            count += CountStones(x, y, -dir, player);
-
-            if (count >= 5) // 5개 이상이면 승리
+            for (int y = 0; y < 15; y++)
             {
-                Debug.Log($"🎉 플레이어 {player} 승리! ({(player == 1 ? "흑돌" : "백돌")})");
-                EndGame(player);
-                return true;
+                if (boardStateInternal[x, y] == internalPlayer)
+                {
+                    foreach (Vector2Int dir in directions)
+                    {
+                        int count = 1;
+                        count += CountStonesInternal(x, y, dir, internalPlayer);
+                        count += CountStonesInternal(x, y, -dir, internalPlayer);
+                        if (count >= 5)
+                        {
+                            Debug.Log($"🎉 CheckWin: 플레이어 {player} 승리! ({(player == 1 ? "백돌" : "흑돌")}) at ({x}, {y})"); // ◀◀◀ 추가
+                            EndGame(internalPlayer);
+                            return true;
+                        }
+                    }
+                }
             }
         }
-
         return false;
     }
-    // 🚀 특정 방향으로 연속된 돌 개수 세기
-    private int CountStones(int x, int y, Vector2Int dir, int player)
+    
+
+    // 내부적으로 돌 개수를 세는 메서드
+    private int CountStonesInternal(int x, int y, Vector2Int dir, int player)
     {
         int count = 0;
-
-        for (int i = 1; i < 5; i++) // 최대 4개 더 체크
+        for (int i = 1; i < 5; i++)
         {
             int nx = x + dir.x * i;
             int ny = y + dir.y * i;
-
-            if (nx < 0 || ny < 0 || nx >= 15 || ny >= 15) break; // 범위 초과
-            if (boardState[nx, ny] != player) break; // 같은 색 돌이 아니면 중단
-
-            count++;
+            if (nx < 0 || ny < 0 || nx >= 15 || ny >= 15) break;
+            if (boardStateInternal[nx, ny] == player) count++;
+            else break;
         }
-
         return count;
     }
-    
+
     private void EndGame(int winner)
     {
-        Debug.Log($"🎉 게임 종료! { (winner == 1 ? "흑돌" : "백돌") } 승리!");
+        Debug.Log($"🎉 EndGame Called! Winner: {winner} ({(winner == -1 ? "흑돌" : "백돌")})"); // ◀◀◀ 추가
 
         // UI 업데이트 (예: 승리 메시지 표시)
         if (turnText != null)
         {
-            turnText.text = $"{(winner == 1 ? "흑돌" : "백돌")} 승리!";
+            turnText.text = $"{(winner == -1 ? "흑돌" : "백돌")} 승리!";
         }
 
         // 💀 모든 입력 비활성화
@@ -501,6 +526,55 @@ public class GameManager : MonoBehaviour
         if (turnTimerCoroutine != null)
         {
             StopCoroutine(turnTimerCoroutine);
+        }
+    }
+
+    // AI가 돌을 놓는 코루틴
+    private IEnumerator PlayAITurn()
+    {
+        Debug.Log("AI Turn Started");
+        yield return new WaitForSeconds(0.5f);
+
+        Board currentBoard = new Board(boardStateInternal, this);
+
+        try
+        {
+            Debug.Log($"AIController instance hash: {aiController.GetHashCode()}");
+            (int, int) bestMove = aiController.GetBestMove(currentBoard);
+            Debug.Log($"AI Best Move: ({bestMove.Item1}, {bestMove.Item2})");
+
+            if (bestMove.Item1 != -1)
+            {
+                int x = bestMove.Item1;
+                int y = bestMove.Item2;
+                Debug.Log($"AI Selected Point: ({x}, {y})");
+                Point pointScript = omokPoints[x * 15 + y].GetComponent<Point>();
+                if (pointScript != null && !pointScript.IsOccupied())
+                {
+                    selectedPoint = omokPoints[x * 15 + y];
+                    PlaceStone(); // AI가 돌을 놓음
+                }
+                else
+                {
+                    Debug.LogWarning("AI가 선택한 위치가 유효하지 않습니다.");
+                    SwitchTurn(); // 이 부분은 상황에 따라 다르게 처리할 수 있습니다.
+                }
+            }
+            else
+            {
+                Debug.LogWarning("AI가 둘 곳이 없습니다.");
+                SwitchTurn(); // 이 부분은 상황에 따라 다르게 처리할 수 있습니다.
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"AI Turn Error: {e}");
+        }
+
+        // AI의 턴이 끝났으므로 다시 사용자에게 턴을 넘깁니다.
+        if (!CheckWin(currentPlayer))  // AI가 이기지 않았으면 턴 넘긴다
+        {
+            SwitchTurn(); 
         }
     }
 }
